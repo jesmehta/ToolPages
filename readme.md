@@ -6,4 +6,4 @@ Welcome to yet_another_web_page of mine !
 
 [Text to Braille Converter](./TextToBraille/index.html)
 
-[Image Filter play](./ImageFilter/index.html)
+[Image Filter play](./ImageFilter/ImageFilterPage/index.html)
