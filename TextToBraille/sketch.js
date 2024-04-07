@@ -28,7 +28,7 @@ function setup() {
   submitButton.mousePressed(submitText);
 
   // Create a checkbox
-  checkbox = createCheckbox("Show letters", false);
+  checkbox = createCheckbox("Show letters", true);
   checkbox.position(submitButton.x + submitButton.width + 5, height + 25);
   checkbox.changed(setLetterFlag);
 
