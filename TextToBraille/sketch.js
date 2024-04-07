@@ -7,7 +7,7 @@ let submitButton;
 let userInput = ""; //to store the text from the input box
 
 let checkbox;
-let anotherButton;
+let resetButton;
 // let checkboxValue = false; //to store checkbox state
 
 function setup() {
