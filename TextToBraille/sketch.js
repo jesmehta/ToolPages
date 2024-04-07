@@ -41,7 +41,7 @@ function setup() {
   fill(0);
   noStroke();
 
-  drawString("in the jungle");
+  // drawString("in the jungle");
 }
 
 function draw() {
