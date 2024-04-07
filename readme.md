@@ -5,3 +5,5 @@ Welcome to yet_another_web_page of mine !
 # Assorted Tools using Creative Coding
 
 [Text to Braille Converter](./TextToBraille/index.html)
+
+[Image Filter play](./ImageFilter/index.html)
