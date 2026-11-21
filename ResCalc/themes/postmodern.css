@@ -1,0 +1,367 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@1&display=swap");
+
+/* Postmodern-but-serious: ink outlines, hard offset shadows, warm paper,
+   a small set of bold accent colours, and a few geometric flourishes. */
+
+:root {
+  --bg: #f3ede2;          /* warm paper */
+  --dot: #d9cfbd;         /* background dot grid */
+  --card: #fffaf1;
+  --text: #1b1a2e;        /* ink */
+  --muted: #5d5a70;
+  --border: #1b1a2e;      /* outlines are ink */
+  --rule: #d8cfc0;        /* light dividers inside cards */
+  --accent: #e4572e;      /* tomato */
+  --teal: #1f8a85;
+  --mustard: #f2b134;
+  --violet: #6c4ab6;
+  --on-violet: #ffffff;
+  --shadow: 5px 5px 0;
+  --error-bg: #ffe1d6;
+  --error-text: #8c2a10;
+  --resistor-body: #e9d3a3;
+  --wire: #3d3b52;
+  --led: #ffe066;
+
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-mono: "IBM Plex Mono", Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15142a;
+    --dot: #26244a;
+    --card: #1f1d38;
+    --text: #f3ede2;
+    --muted: #b3aec8;
+    --border: #f3ede2;
+    --rule: #3a3760;
+    --accent: #ff7a50;
+    --teal: #3cc1b9;
+    --mustard: #f5c451;
+    --violet: #a68af0;
+    --on-violet: #15142a;
+    --error-bg: #4a1f17;
+    --error-text: #ffb59e;
+    --resistor-body: #cdb688;
+    --wire: #b3aec8;
+    --led: #ffe066;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+main {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 32px 16px 56px;
+}
+
+/* ---------- header ---------- */
+
+header {
+  position: relative;
+  padding-right: 110px;
+  margin-bottom: 22px;
+}
+
+/* geometric flourishes: a mustard sun and a teal triangle */
+header::before,
+header::after {
+  content: "";
+  position: absolute;
+  border: 2px solid var(--border);
+}
+header::before {
+  width: 62px; height: 62px;
+  right: 34px; top: 0;
+  border-radius: 50%;
+  background: var(--mustard);
+}
+header::after {
+  width: 46px; height: 46px;
+  right: 0; top: 30px;
+  background: var(--teal);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  border: none;
+}
+
+h1, h2, h3, legend, .tabs button, .cg-head {
+  font-family: var(--font-display);
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.7rem, 5vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+/* squiggle underline under the title */
+h1::after {
+  content: "";
+  display: block;
+  width: 120px;
+  height: 10px;
+  margin-top: 10px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='10'%3E%3Cpath d='M0 5 Q6 0 12 5 T24 5' fill='none' stroke='%23e4572e' stroke-width='2.5'/%3E%3C/svg%3E") repeat-x;
+}
+
+h2 {
+  margin: 0 0 14px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* little coloured block in front of each card heading */
+h2::before {
+  content: "";
+  width: 14px; height: 14px;
+  border: 2px solid var(--border);
+  background: var(--card-accent, var(--accent));
+}
+
+h3 { margin: 26px 0 10px; font-size: 1.05rem; font-weight: 600; }
+
+.subtitle { margin: 0; color: var(--muted); max-width: 52ch; }
+
+/* ---------- cards ---------- */
+
+.card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  padding: 20px 22px;
+  margin-bottom: 22px;
+  box-shadow: var(--shadow) var(--card-accent, var(--accent));
+}
+
+/* Each panel's cards: inputs = teal, circuit = mustard, results = tomato */
+[role="tabpanel"] .card:nth-of-type(1) { --card-accent: var(--teal); }
+[role="tabpanel"] .card:nth-of-type(2) { --card-accent: var(--mustard); }
+[role="tabpanel"] .card:nth-of-type(3) { --card-accent: var(--accent); }
+
+/* ---------- tabs ---------- */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tabs button {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 7px 18px;
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+
+.tabs button:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--border); }
+
+.tabs button[aria-selected="true"] {
+  background: var(--violet);
+  color: var(--on-violet);
+  box-shadow: 3px 3px 0 var(--border);
+}
+
+.tabs button:focus-visible { outline: 3px dashed var(--accent); outline-offset: 3px; }
+
+/* ---------- inputs ---------- */
+
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 16px;
+}
+
+legend { font-weight: 600; margin-bottom: 8px; }
+
+.sym { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--muted); font-size: 1.1em; }
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  align-items: center;
+}
+
+.options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+input[type="radio"] { accent-color: var(--accent); width: 16px; height: 16px; }
+
+input[type="number"] {
+  width: 90px;
+  padding: 4px 8px;
+  border: 2px solid var(--border);
+  border-radius: 3px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+}
+
+input[type="number"]:disabled { opacity: 0.35; }
+input[type="number"]:focus { outline: none; box-shadow: 3px 3px 0 var(--accent); }
+
+/* ---------- sliders ---------- */
+
+.slider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.slider input[type="range"] {
+  flex: 1;
+  max-width: 360px;
+  accent-color: var(--accent);
+}
+
+.slider output {
+  min-width: 2.2em;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 0 6px;
+  border: 2px solid var(--border);
+  background: var(--mustard);
+  color: #1b1a2e;
+}
+
+/* ---------- results table ---------- */
+
+table.calc {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table.calc th, table.calc td {
+  padding: 9px 6px;
+  border-bottom: 1px dashed var(--rule);
+  text-align: left;
+  vertical-align: middle;
+}
+
+table.calc tr:last-child th, table.calc tr:last-child td { border-bottom: none; }
+
+table.calc th { font-weight: 500; }
+.formula { font-family: var(--font-serif); font-style: italic; font-size: 1.1rem; color: var(--muted); }
+.value {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---------- resistor choice: 3 columns ---------- */
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px 14px;
+  text-align: center;
+  align-items: center;
+}
+
+.cg-head {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 6px;
+  align-self: end;
+}
+
+.cg-val { font-family: var(--font-mono); font-size: 1.45rem; font-weight: 600; margin: 6px 0; }
+.cg-val.accent { color: var(--accent); }
+
+.cg-bands svg { width: 100%; max-width: 220px; height: auto; display: block; margin: 0 auto; }
+.cg-bands .bands { margin: 2px 0 0; font-size: 0.85rem; }
+.cg-none { color: var(--muted); font-size: 1.4rem; }
+
+.cg-cur {
+  margin: 0;
+  padding-top: 6px;
+  border-top: 1px dashed var(--rule);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--muted);
+  align-self: start;
+}
+
+/* ---------- circuit diagram ---------- */
+
+.diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.dg-label { font-family: var(--font-mono); font-size: 13px; font-weight: 600; fill: var(--text); }
+.dg-small { font-family: var(--font-serif); font-style: italic; font-size: 13px; fill: var(--muted); }
+.dg-empty { font-family: var(--font-serif); font-size: 16px; fill: var(--muted); font-style: italic; }
+
+/* ---------- misc ---------- */
+
+.bands { margin: 4px 0; }
+.note { color: var(--muted); margin: 8px 0; font-size: 0.95rem; }
+
+.error {
+  background: var(--error-bg);
+  color: var(--error-text);
+  border: 2px solid currentColor;
+  padding: 10px 12px;
+  border-radius: 3px;
+  margin: 0 0 12px;
+}
+
+footer {
+  color: var(--muted);
+  font-size: 0.9rem;
+  border-top: 2px solid var(--border);
+  padding-top: 12px;
+}
+
+@media (max-width: 520px) {
+  header { padding-right: 84px; }
+  table.calc .value { white-space: normal; }
+  header::before { width: 40px; height: 40px; right: 22px; }
+  header::after { width: 30px; height: 30px; top: 22px; }
+  .card { padding: 16px 14px; box-shadow: 4px 4px 0 var(--card-accent, var(--accent)); }
+  table.calc .formula { display: none; }
+  .choice-grid { gap: 6px 8px; }
+  .cg-val { font-size: 1.05rem; }
+  .cg-head { font-size: 0.66rem; }
+  .cg-bands .bands, .cg-cur { font-size: 0.72rem; }
+}
