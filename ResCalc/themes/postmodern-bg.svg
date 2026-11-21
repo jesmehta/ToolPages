@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="360" viewBox="0 0 360 360">
+  <!-- Background tile for the postmodern theme: electrical symbols scattered
+       Memphis-style. Faintness is set by the group opacity below. -->
+  <g fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.3">
+
+    <!-- resistor (zigzag) -->
+    <path transform="translate(22 40) rotate(-18)" stroke="#e4572e"
+          d="M0 10 h10 l4 -8 l7 16 l7 -16 l7 16 l7 -16 l4 8 h10"/>
+
+    <!-- LED: diode + light arrows -->
+    <g transform="translate(200 24) rotate(12)" stroke="#1f8a85">
+      <path d="M0 14 h12 M12 4 v20 l18 -10 z M30 4 v20 M30 14 h12"/>
+      <path d="M18 0 l6 -8 m-4 0 h4 v4 M25 2 l6 -8 m-4 0 h4 v4"/>
+    </g>
+
+    <!-- capacitor -->
+    <path transform="translate(300 110) rotate(90)" stroke="#6c4ab6"
+          d="M0 12 h14 M14 0 v24 M22 0 v24 M22 12 h14"/>
+
+    <!-- ground -->
+    <path transform="translate(118 116) rotate(-8)" stroke="#f2b134"
+          d="M14 0 v12 M0 12 h28 M5 18 h18 M10 24 h8"/>
+
+    <!-- battery -->
+    <path transform="translate(30 200) rotate(24)" stroke="#1f8a85"
+          d="M0 14 h12 M12 2 v24 M18 8 v12 M24 2 v24 M30 8 v12 M30 14 h12"/>
+
+    <!-- switch -->
+    <g transform="translate(176 196) rotate(-30)" stroke="#e4572e">
+      <path d="M0 14 h12 M14 14 l20 -10 M36 14 h12"/>
+      <circle cx="13" cy="14" r="2"/>
+      <circle cx="35" cy="14" r="2"/>
+    </g>
+
+    <!-- inductor (coil) -->
+    <path transform="translate(260 262) rotate(8)" stroke="#f2b134"
+          d="M0 12 h8 a6 6 0 0 1 12 0 a6 6 0 0 1 12 0 a6 6 0 0 1 12 0 h8"/>
+
+    <!-- lamp -->
+    <g transform="translate(92 290) rotate(15)" stroke="#6c4ab6">
+      <path d="M0 14 h8 M36 14 h8"/>
+      <circle cx="22" cy="14" r="13"/>
+      <path d="M13 5 l18 18 M31 5 l-18 18"/>
+    </g>
+
+    <!-- small fillers: junction dot, ring, AC wave -->
+    <circle cx="330" cy="30" r="3" fill="#e4572e" stroke="none"/>
+    <circle cx="250" cy="170" r="6" stroke="#6c4ab6"/>
+    <circle cx="20" cy="130" r="3" fill="#1f8a85" stroke="none"/>
+    <path transform="translate(310 320) rotate(-12)" stroke="#1f8a85" d="M0 6 q6 -10 12 0 t12 0"/>
+    <circle cx="200" cy="330" r="3" fill="#f2b134" stroke="none"/>
+  </g>
+</svg>

@@ -5,7 +5,6 @@
 
 :root {
   --bg: #f3ede2;          /* warm paper */
-  --dot: #d9cfbd;         /* background dot grid */
   --card: #fffaf1;
   --text: #1b1a2e;        /* ink */
   --muted: #5d5a70;
@@ -32,7 +31,6 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #15142a;
-    --dot: #26244a;
     --card: #1f1d38;
     --text: #f3ede2;
     --muted: #b3aec8;
@@ -56,8 +54,9 @@
 body {
   margin: 0;
   background-color: var(--bg);
-  background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px);
-  background-size: 22px 22px;
+  /* faint electrical symbols, scattered Memphis-style (see postmodern-bg.svg) */
+  background-image: url("postmodern-bg.svg");
+  background-size: 360px 360px;
   color: var(--text);
   font-family: var(--font-body);
   line-height: 1.5;
