@@ -14,101 +14,241 @@
       <p class="subtitle">A simple tool to calculate the resistor required to control voltage and current for LEDs.</p>
     </header>
 
-    <section class="card">
-      <h2>Inputs</h2>
+    <nav class="tabs" role="tablist">
+      <button role="tab" id="tab-single" aria-controls="panel-single" aria-selected="true">Single LED</button>
+      <button role="tab" id="tab-multi" aria-controls="panel-multi" aria-selected="false">Multiple LEDs</button>
+    </nav>
 
-      <fieldset>
-        <legend>Power source &nbsp;<span class="sym">V<sub>source</sub></span></legend>
-        <div class="options" data-group="vsource">
-          <label><input type="radio" name="vsource" value="5" checked> USB 5 V</label>
-          <label><input type="radio" name="vsource" value="12"> Wall adaptor 12 V</label>
-          <label><input type="radio" name="vsource" value="custom"> Custom
-            <input type="number" id="vsource-custom" step="any" min="0" placeholder="V" disabled></label>
-        </div>
-      </fieldset>
+    <!-- =================== Tab 1: Single LED =================== -->
+    <div role="tabpanel" id="panel-single" aria-labelledby="tab-single" data-prefix="s">
+      <section class="card">
+        <h2>Inputs</h2>
 
-      <fieldset>
-        <legend>LED power &nbsp;<span class="sym">P<sub>LED</sub></span></legend>
-        <div class="options" data-group="power">
-          <label><input type="radio" name="power" value="1" checked> 1 W</label>
-          <label><input type="radio" name="power" value="3"> 3 W</label>
-          <label><input type="radio" name="power" value="custom"> Custom
-            <input type="number" id="power-custom" step="any" min="0" placeholder="W" disabled></label>
-        </div>
-      </fieldset>
+        <fieldset>
+          <legend>Power source &nbsp;<span class="sym">V<sub>source</sub></span></legend>
+          <div class="options">
+            <label><input type="radio" name="s-vsource" value="5" checked> USB 5 V</label>
+            <label><input type="radio" name="s-vsource" value="12"> Wall adaptor 12 V</label>
+            <label><input type="radio" name="s-vsource" value="custom"> Custom
+              <input type="number" id="s-vsource-custom" step="any" min="0" placeholder="V" disabled></label>
+          </div>
+        </fieldset>
 
-      <fieldset>
-        <legend>LED forward voltage &nbsp;<span class="sym">V<sub>LED</sub></span></legend>
-        <div class="options" data-group="vled">
-          <label><input type="radio" name="vled" value="3.2" checked> 3.2 V</label>
-          <label><input type="radio" name="vled" value="custom"> Custom
-            <input type="number" id="vled-custom" step="any" min="0" placeholder="V" disabled></label>
-        </div>
-      </fieldset>
-    </section>
+        <fieldset>
+          <legend>LED power &nbsp;<span class="sym">P<sub>LED</sub></span></legend>
+          <div class="options">
+            <label><input type="radio" name="s-power" value="1" checked> 1 W</label>
+            <label><input type="radio" name="s-power" value="3"> 3 W</label>
+            <label><input type="radio" name="s-power" value="custom"> Custom
+              <input type="number" id="s-power-custom" step="any" min="0" placeholder="W" disabled></label>
+          </div>
+        </fieldset>
 
-    <section class="card">
-      <h2>Results</h2>
-      <p id="error" class="error" hidden></p>
+        <fieldset>
+          <legend>LED forward voltage &nbsp;<span class="sym">V<sub>LED</sub></span></legend>
+          <div class="options">
+            <label><input type="radio" name="s-vled" value="3.2" checked> 3.2 V</label>
+            <label><input type="radio" name="s-vled" value="custom"> Custom
+              <input type="number" id="s-vled-custom" step="any" min="0" placeholder="V" disabled></label>
+          </div>
+        </fieldset>
+      </section>
 
-      <div id="results">
-        <table class="calc">
-          <tr>
-            <th>LED current</th>
-            <td class="formula">I<sub>LED</sub> = P<sub>LED</sub> / V<sub>LED</sub></td>
-            <td id="out-i" class="value"></td>
-          </tr>
-          <tr>
-            <th>Voltage to drop</th>
-            <td class="formula">&Delta;V = V<sub>source</sub> &minus; V<sub>LED</sub></td>
-            <td id="out-dv" class="value"></td>
-          </tr>
-          <tr>
-            <th>Required resistance</th>
-            <td class="formula">R = &Delta;V / I<sub>LED</sub></td>
-            <td id="out-r" class="value"></td>
-          </tr>
-          <tr>
-            <th>Resistor power</th>
-            <td class="formula">P<sub>R</sub> = &Delta;V &times; I<sub>LED</sub></td>
-            <td id="out-pr" class="value"></td>
-          </tr>
-        </table>
+      <section class="card">
+        <h2>Circuit</h2>
+        <svg id="s-diagram" class="diagram" role="img" aria-label="Circuit diagram: resistor in series with one LED"></svg>
+      </section>
 
-        <h3>Resistor choice (standard E24 values, &plusmn;5%)</h3>
-        <div class="choice required">
-          <div class="choice-label">Required (calculated)</div>
-          <p class="big" id="out-req"></p>
-          <p class="note">Not usually available off the shelf &mdash; pick a standard value below.</p>
-        </div>
+      <section class="card">
+        <h2>Results</h2>
+        <p id="s-error" class="error" hidden></p>
 
-        <div class="choice">
-          <div class="choice-label">Closest standard</div>
-          <div class="resistor-row">
-            <svg id="svg-closest" viewBox="0 0 320 80" role="img" aria-label="Closest standard resistor colour bands"></svg>
-            <div>
-              <p class="big" id="out-closest"></p>
-              <p id="bands-closest" class="bands"></p>
-              <p id="note-closest" class="note"></p>
+        <div id="s-results">
+          <table class="calc">
+            <tr>
+              <th>LED current</th>
+              <td class="formula">I<sub>LED</sub> = P<sub>LED</sub> / V<sub>LED</sub></td>
+              <td id="s-out-i" class="value"></td>
+            </tr>
+            <tr>
+              <th>Voltage to drop</th>
+              <td class="formula">&Delta;V = V<sub>source</sub> &minus; V<sub>LED</sub></td>
+              <td id="s-out-dv" class="value"></td>
+            </tr>
+            <tr>
+              <th>Required resistance</th>
+              <td class="formula">R = &Delta;V / I<sub>LED</sub></td>
+              <td id="s-out-r" class="value"></td>
+            </tr>
+            <tr>
+              <th>Resistor power rating</th>
+              <td class="formula">P<sub>R</sub> = &Delta;V &times; I<sub>LED</sub></td>
+              <td id="s-out-pr" class="value"></td>
+            </tr>
+          </table>
+
+          <h3>Resistor choice (standard E24 values, &plusmn;5%)</h3>
+          <div class="choice-grid">
+            <div class="cg-head">Calculated</div>
+            <div class="cg-head">Closest standard</div>
+            <div class="cg-head">Closest standard up (safer)</div>
+
+            <p class="cg-val" id="s-out-req"></p>
+            <p class="cg-val accent" id="s-out-closest"></p>
+            <p class="cg-val accent" id="s-out-up"></p>
+
+            <div class="cg-bands cg-none">&mdash;</div>
+            <div class="cg-bands">
+              <svg id="s-svg-closest" viewBox="0 0 320 80" role="img" aria-label="Closest standard resistor colour bands"></svg>
+              <p id="s-bands-closest" class="bands"></p>
             </div>
+            <div class="cg-bands">
+              <svg id="s-svg-up" viewBox="0 0 320 80" role="img" aria-label="Closest standard up resistor colour bands"></svg>
+              <p id="s-bands-up" class="bands"></p>
+            </div>
+
+            <p class="cg-cur" id="s-cur-req"></p>
+            <p class="cg-cur" id="s-cur-closest"></p>
+            <p class="cg-cur" id="s-cur-up"></p>
           </div>
         </div>
+      </section>
+    </div>
 
-        <div class="choice">
-          <div class="choice-label">Closest standard up (safer)</div>
-          <div class="resistor-row">
-            <svg id="svg-up" viewBox="0 0 320 80" role="img" aria-label="Closest standard up resistor colour bands"></svg>
-            <div>
-              <p class="big" id="out-up"></p>
-              <p id="bands-up" class="bands"></p>
-              <p id="note-up" class="note"></p>
+    <!-- =================== Tab 2: Multiple LEDs =================== -->
+    <div role="tabpanel" id="panel-multi" aria-labelledby="tab-multi" data-prefix="m" hidden>
+      <section class="card">
+        <h2>Inputs</h2>
+
+        <fieldset>
+          <legend>LEDs in series per string &nbsp;<span class="sym">n<sub>series</sub></span></legend>
+          <div class="slider">
+            <input type="range" id="m-series" min="0" max="12" step="1" value="3">
+            <output id="m-series-val" for="m-series">3</output>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Strings in parallel &nbsp;<span class="sym">n<sub>parallel</sub></span></legend>
+          <div class="slider">
+            <input type="range" id="m-parallel" min="0" max="10" step="1" value="1">
+            <output id="m-parallel-val" for="m-parallel">1</output>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Power source &nbsp;<span class="sym">V<sub>source</sub></span></legend>
+          <div class="options">
+            <label><input type="radio" name="m-vsource" value="5"> USB 5 V</label>
+            <label><input type="radio" name="m-vsource" value="12" checked> Wall adaptor 12 V</label>
+            <label><input type="radio" name="m-vsource" value="custom"> Custom
+              <input type="number" id="m-vsource-custom" step="any" min="0" placeholder="V" disabled></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>LED power (each) &nbsp;<span class="sym">P<sub>LED</sub></span></legend>
+          <div class="options">
+            <label><input type="radio" name="m-power" value="1" checked> 1 W</label>
+            <label><input type="radio" name="m-power" value="3"> 3 W</label>
+            <label><input type="radio" name="m-power" value="custom"> Custom
+              <input type="number" id="m-power-custom" step="any" min="0" placeholder="W" disabled></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>LED forward voltage (each) &nbsp;<span class="sym">V<sub>LED</sub></span></legend>
+          <div class="options">
+            <label><input type="radio" name="m-vled" value="3.2" checked> 3.2 V</label>
+            <label><input type="radio" name="m-vled" value="custom"> Custom
+              <input type="number" id="m-vled-custom" step="any" min="0" placeholder="V" disabled></label>
+          </div>
+        </fieldset>
+      </section>
+
+      <section class="card">
+        <h2>Circuit</h2>
+        <svg id="m-diagram" class="diagram" role="img" aria-label="Circuit diagram of the LED array"></svg>
+        <p class="note">Each string gets its own resistor. Parallel LEDs sharing one resistor don't split the current
+          evenly, so one LED can end up over-driven.</p>
+      </section>
+
+      <section class="card">
+        <h2>Results</h2>
+        <p id="m-error" class="error" hidden></p>
+
+        <div id="m-results">
+          <table class="calc">
+            <tr>
+              <th>LED current (= string current)</th>
+              <td class="formula">I<sub>LED</sub> = P<sub>LED</sub> / V<sub>LED</sub></td>
+              <td id="m-out-i" class="value"></td>
+            </tr>
+            <tr>
+              <th>String voltage</th>
+              <td class="formula">V<sub>string</sub> = n<sub>series</sub> &times; V<sub>LED</sub></td>
+              <td id="m-out-vstring" class="value"></td>
+            </tr>
+            <tr>
+              <th>Voltage to drop</th>
+              <td class="formula">&Delta;V = V<sub>source</sub> &minus; V<sub>string</sub></td>
+              <td id="m-out-dv" class="value"></td>
+            </tr>
+            <tr>
+              <th>Required resistance (per string)</th>
+              <td class="formula">R = &Delta;V / I<sub>LED</sub></td>
+              <td id="m-out-r" class="value"></td>
+            </tr>
+            <tr>
+              <th>Resistor power rating (each)</th>
+              <td class="formula">P<sub>R</sub> = &Delta;V &times; I<sub>LED</sub></td>
+              <td id="m-out-pr" class="value"></td>
+            </tr>
+            <tr>
+              <th>Total current from source</th>
+              <td class="formula">I<sub>total</sub> = n<sub>parallel</sub> &times; I<sub>LED</sub></td>
+              <td id="m-out-itotal" class="value"></td>
+            </tr>
+            <tr>
+              <th>Total power from source</th>
+              <td class="formula">P<sub>total</sub> = V<sub>source</sub> &times; I<sub>total</sub></td>
+              <td id="m-out-ptotal" class="value"></td>
+            </tr>
+            <tr>
+              <th>Power in LEDs / efficiency</th>
+              <td class="formula">n<sub>series</sub> &times; n<sub>parallel</sub> &times; P<sub>LED</sub></td>
+              <td id="m-out-pleds" class="value"></td>
+            </tr>
+          </table>
+
+          <h3>Resistor choice (standard E24 values, &plusmn;5%)</h3>
+          <p id="m-out-count" class="note"></p>
+          <div class="choice-grid">
+            <div class="cg-head">Calculated (per string)</div>
+            <div class="cg-head">Closest standard</div>
+            <div class="cg-head">Closest standard up (safer)</div>
+
+            <p class="cg-val" id="m-out-req"></p>
+            <p class="cg-val accent" id="m-out-closest"></p>
+            <p class="cg-val accent" id="m-out-up"></p>
+
+            <div class="cg-bands cg-none">&mdash;</div>
+            <div class="cg-bands">
+              <svg id="m-svg-closest" viewBox="0 0 320 80" role="img" aria-label="Closest standard resistor colour bands"></svg>
+              <p id="m-bands-closest" class="bands"></p>
             </div>
+            <div class="cg-bands">
+              <svg id="m-svg-up" viewBox="0 0 320 80" role="img" aria-label="Closest standard up resistor colour bands"></svg>
+              <p id="m-bands-up" class="bands"></p>
+            </div>
+
+            <p class="cg-cur" id="m-cur-req"></p>
+            <p class="cg-cur" id="m-cur-closest"></p>
+            <p class="cg-cur" id="m-cur-up"></p>
           </div>
         </div>
-
-        <p id="out-rating" class="note"></p>
-      </div>
-    </section>
+      </section>
+    </div>
 
     <footer>
       <p>Notes: a resistor is a simple way to limit LED current, but it wastes &Delta;V &times; I as heat. For high-power LEDs

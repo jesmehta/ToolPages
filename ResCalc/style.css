@@ -9,6 +9,7 @@
   --error-text: #9b1c1c;
   --resistor-body: #e8d3a8;
   --wire: #9aa0a6;
+  --led: #fff3b0;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,6 +24,7 @@
     --error-text: #fca5a5;
     --resistor-body: #c9b385;
     --wire: #7b8188;
+    --led: #f5e27a;
   }
 }
 
@@ -110,33 +112,112 @@ table.calc th { font-weight: 500; }
 .formula { color: var(--muted); font-style: italic; }
 .value { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
 
-.resistor-row {
-  display: flex;
-  flex-wrap: wrap;
+/* ---------- resistor choice: 3 columns ---------- */
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px 14px;
+  text-align: center;
   align-items: center;
-  gap: 16px;
 }
 
-.resistor-row svg { width: 100%; max-width: 320px; height: auto; }
-
-.choice {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
-}
-
-.choice-label {
+.cg-head {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--muted);
-  margin-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+  align-self: end;
 }
 
-.choice.required .big { color: var(--text); }
+.cg-val { font-size: 1.5rem; font-weight: 700; margin: 4px 0; }
+.cg-val.accent { color: var(--accent); }
 
-.big { font-size: 1.6rem; font-weight: 700; margin: 0; color: var(--accent); }
+.cg-bands svg { width: 100%; max-width: 220px; height: auto; display: block; margin: 0 auto; }
+.cg-bands .bands { margin: 2px 0 0; font-size: 0.85rem; }
+.cg-none { color: var(--muted); font-size: 1.4rem; }
+
+.cg-cur {
+  margin: 0;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  align-self: start;
+}
+
+@media (max-width: 520px) {
+  .choice-grid { gap: 6px 8px; }
+  .cg-val { font-size: 1.1rem; }
+  .cg-head { font-size: 0.7rem; }
+  .cg-bands .bands, .cg-cur { font-size: 0.75rem; }
+}
+
+/* ---------- tabs ---------- */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tabs button {
+  font: inherit;
+  font-weight: 600;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  margin-bottom: -1px;
+}
+
+.tabs button[aria-selected="true"] {
+  background: var(--card);
+  color: var(--accent);
+  border-color: var(--border);
+}
+
+/* ---------- sliders ---------- */
+
+.slider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slider input[type="range"] {
+  flex: 1;
+  max-width: 360px;
+  accent-color: var(--accent);
+}
+
+.slider output {
+  min-width: 2ch;
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- circuit diagram ---------- */
+
+.diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.dg-label { font-size: 13px; font-weight: 600; fill: var(--text); }
+.dg-small { font-size: 11px; fill: var(--muted); }
+.dg-empty { font-size: 14px; fill: var(--muted); font-style: italic; }
+
 .bands { margin: 4px 0; }
 .note { color: var(--muted); margin: 6px 0; font-size: 0.95rem; }
 
@@ -152,4 +233,5 @@ footer { color: var(--muted); font-size: 0.9rem; }
 
 @media (max-width: 520px) {
   table.calc .formula { display: none; }
+  table.calc .value { white-space: normal; }
 }
