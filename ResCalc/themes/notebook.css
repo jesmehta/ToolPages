@@ -1,0 +1,246 @@
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Gochi+Hand&family=Martian+Mono:wght@400;600&display=swap");
+
+/* Engineer's notebook: graph paper, ballpoint-blue ink, a red margin line,
+   hand-lettered headings, highlighter marks, precise mono numbers. */
+
+:root {
+  --bg: #f8f5ea;
+  --grid: rgba(70, 120, 170, 0.16);
+  --grid-major: rgba(70, 120, 170, 0.28);
+  --card: transparent;
+  --text: #22305a;            /* ballpoint ink */
+  --muted: #5b6687;
+  --border: #22305a;
+  --accent: #e4572e;
+  --teal: #1f8a85;
+  --mustard: #f2b134;
+  --violet: #6c4ab6;
+  --highlight: rgba(242, 177, 52, 0.55);
+  --highlight-teal: rgba(31, 138, 133, 0.28);
+  --error-bg: #fff2b8;
+  --error-text: #22305a;
+  --resistor-body: #ead6a8;
+  --wire: #22305a;
+  --led: #ffe066;
+
+  --hand: "Gochi Hand", "Comic Sans MS", cursive;
+  --body: "Atkinson Hyperlegible", "Segoe UI", sans-serif;
+  --mono: "Martian Mono", Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #172033;
+    --grid: rgba(150, 180, 220, 0.08);
+    --grid-major: rgba(150, 180, 220, 0.15);
+    --text: #e9e6da;          /* chalky ink */
+    --muted: #a9b2c9;
+    --border: #e9e6da;
+    --accent: #ff7a50;
+    --teal: #3cc1b9;
+    --highlight: rgba(242, 177, 52, 0.35);
+    --highlight-teal: rgba(60, 193, 185, 0.25);
+    --error-bg: #4a3d14;
+    --error-text: #fff2b8;
+    --resistor-body: #cdb688;
+    --wire: #c9cfdd;
+  }
+}
+
+body {
+  font-family: var(--body);
+  background-color: var(--bg);
+  /* 5 mm graph paper with a heavier line every 5 squares */
+  background-image:
+    linear-gradient(var(--grid-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+}
+
+main {
+  position: relative;
+  padding-left: 44px;
+}
+
+/* red margin line */
+main::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 24px;
+  width: 0;
+  border-left: 2px solid var(--accent);
+  opacity: 0.7;
+}
+
+h1, h2, h3, legend, .tabs button, .cg-head, .formula, .error, .dg-label, .dg-small {
+  font-family: var(--hand);
+  font-weight: 400;
+}
+
+h1 {
+  font-size: clamp(2rem, 6vw, 2.8rem);
+  line-height: 1.05;
+  margin-bottom: 6px;
+}
+
+h1::after {
+  /* a scribbled double underline */
+  content: "";
+  display: block;
+  width: 180px;
+  height: 6px;
+  margin-top: 4px;
+  border-top: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  transform: rotate(-1deg);
+  opacity: 0.8;
+}
+
+.subtitle { color: var(--muted); font-style: italic; margin-bottom: 22px; }
+
+/* ---------- tabs: index tabs on the page edge ---------- */
+
+.tabs {
+  border-bottom: 2px solid var(--border);
+  gap: 6px;
+}
+
+.tabs button {
+  font-size: 1.35rem;
+  padding: 2px 16px 0;
+  color: var(--muted);
+  border: 2px solid var(--border);
+  border-bottom: none;
+  border-radius: 10px 14px 0 0;
+  background: var(--bg);
+  margin-bottom: 0;
+}
+
+.tabs button[aria-selected="true"] {
+  color: var(--text);
+  background: linear-gradient(transparent 50%, var(--highlight-teal) 50%, var(--highlight-teal) 85%, transparent 85%), var(--bg);
+  border-color: var(--border);
+}
+
+/* ---------- sections: written straight on the page ---------- */
+
+.card {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 6px 0 14px;
+  margin-bottom: 18px;
+  border-bottom: 2px dashed var(--grid-major);
+}
+
+h2 {
+  font-size: 1.9rem;
+  display: inline-block;
+  padding: 0 6px;
+  margin: 0 0 10px -6px;
+  /* highlighter stroke */
+  background: linear-gradient(transparent 55%, var(--highlight) 55%, var(--highlight) 90%, transparent 90%);
+}
+
+h3 { font-size: 1.45rem; }
+
+legend { font-size: 1.3rem; }
+.sym { font-family: var(--mono); font-size: 0.8em; font-style: normal; }
+
+input[type="radio"] { accent-color: var(--teal); }
+
+/* fill-in-the-blank */
+input[type="number"] {
+  border: none;
+  border-bottom: 2px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--mono);
+  color: var(--text);
+}
+
+.slider input[type="range"] { accent-color: var(--teal); }
+
+.slider output {
+  font-family: var(--mono);
+  font-size: 1.2rem;
+  border: 2px solid var(--accent);
+  border-radius: 50% 45% 55% 48%;
+  padding: 0 10px;
+  transform: rotate(-3deg);
+}
+
+/* ---------- results ---------- */
+
+table.calc th, table.calc td {
+  border-bottom: none;
+  padding: 6px 6px;
+}
+
+table.calc th { font-weight: 400; }
+
+.formula { font-size: 1.3rem; font-style: normal; color: var(--muted); }
+
+.value {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.cg-head {
+  font-size: 1.25rem;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+  border-bottom: 2px solid var(--border);
+}
+
+.cg-val { font-family: var(--mono); font-weight: 600; font-size: 1.25rem; }
+.cg-val.accent { color: var(--text); }
+
+/* circle the safer choice, like you would in pen */
+[id$="-out-up"] {
+  justify-self: center;
+  padding: 4px 14px;
+  border: 2px solid var(--accent);
+  border-radius: 52% 48% 55% 45% / 60% 50% 50% 40%;
+  transform: rotate(-2deg);
+}
+
+.cg-bands .bands { font-size: 0.85rem; color: var(--muted); }
+.cg-cur { font-family: var(--mono); font-size: 0.72rem; border-top: 1px dashed var(--grid-major); }
+
+/* ---------- diagram ---------- */
+
+.dg-label { font-size: 18px; fill: var(--text); }
+.dg-small { font-size: 16px; font-style: normal; fill: var(--muted); }
+.dg-empty { font-family: var(--hand); font-size: 18px; }
+
+/* ---------- misc ---------- */
+
+.note { color: var(--muted); }
+
+/* sticky note */
+.error {
+  font-size: 1.25rem;
+  background: var(--error-bg);
+  color: var(--error-text);
+  border-radius: 0;
+  padding: 12px 14px;
+  transform: rotate(-0.8deg);
+  box-shadow: 0 6px 12px -6px rgba(0, 0, 0, 0.35);
+}
+
+footer { font-size: 0.85rem; }
+
+@media (max-width: 520px) {
+  main { padding-left: 30px; }
+  main::before { left: 14px; }
+  .cg-head { font-size: 1rem; }
+  .cg-val { font-size: 0.95rem; }
+  [id$="-out-up"] { padding: 3px 8px; }
+  .cg-cur { font-size: 0.62rem; }
+}
