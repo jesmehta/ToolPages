@@ -88,12 +88,11 @@ Results show the working per block, the total, and the closest E24 value with it
 
 ### Resistor finder
 
-Type a value, choose 4-band (2 digits) or 5-band (3 digits) and a tolerance (gold ±5% default for 4-band,
-brown ±1% for 5-band). Shows a large resistor drawing and a band-by-band key (digit / multiplier / tolerance).
-Notes say when the value had to be rounded to fit the digits, and (4-band only) when it isn't an E24 value.
+One row, three columns: **Resistor needed** (type a value) → **Closest standard** (E24) → **Look for**
+(4-band ±5% colour drawing plus band names). Under the input it says when the value is already a standard one.
 
-**Value input** (both new tabs): `220`, `4.7k`, `4k7`, `4R7`, `1M`, `2.2 kΩ`, `470 ohm`. `m`/`M` both mean mega.
-Bad values get a red outline and an error message instead of results.
+**Value input** (tabs 3 and 4): `220`, `4.7k`, `4k7`, `4R7`, `1M`, `2.2 kΩ`, `470 ohm`. `m`/`M` both mean mega.
+Bad values get a red outline; the equivalent tab shows an error, the finder shows "Not understood".
 
 ## Design decisions
 
@@ -112,7 +111,10 @@ Bad values get a red outline and an error message instead of results.
 - **Equivalent resistance as "series of parallel blocks"**: covers most real hobby networks with a simple UI.
   Arbitrary nesting (parallel of series of parallel…) would need a tree editor; not worth it yet.
 - **Values typed as text** (not number boxes) so `4k7` and `2.2k` work the way they're printed on parts lists.
-- **One band encoder** (`bandCode`) for 2 or 3 digits; colour bands everywhere use it. Multiplier is limited to
+- **Finder kept to one row** (user request, 2026-11-22): the first version had 4/5-band and tolerance choices and
+  a band-by-band key; that was more than people need when hunting through a parts box. It now always shows the
+  closest E24 value as a 4-band ±5% code. 5-band/E96 could come back as an option if wanted.
+- **One band encoder** (`bandCode`, takes a digit count, currently always 2); colour bands everywhere use it. Multiplier is limited to
   silver (×0.01) … white (×1G); outside that the finder says it can't be shown.
 - **No libraries**: unlike the other ToolPages tools, this needs no canvas drawing, so p5.js isn't used. The resistor
   is a small inline SVG.
@@ -142,6 +144,8 @@ Bad values get a red outline and an error message instead of results.
 - 2026-11-21 — Postmodern background: faint Memphis-style tile of electrical symbols replaces the dot grid.
 - 2026-11-21 — Added tabs 3 (Equivalent resistance: series of parallel blocks, live network diagram) and
   4 (Resistor finder: value → 4/5-band colour code with a band-by-band key). Text value input with k/M/RKM parsing.
+- 2026-11-22 — Resistor finder simplified to one row: resistor needed | closest standard (E24) | colour bands.
+  Removed band-count and tolerance options and the band key.
 
 ## To do / watch out for
 
