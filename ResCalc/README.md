@@ -90,8 +90,10 @@ supply 312.5 mA / 3.75 W, 80% efficiency.
 ## Files
 
 - `index.html` — page structure and inputs
-- `style.css` — layout, light/dark colours
-- `script.js` — calculation (shared by both tabs), E24 lookup, colour bands, resistor and circuit SVG drawing, tabs
+- `style.css` — base layout and plain light/dark colours
+- `themes/*.css` — visual themes layered on top of the base (fonts, colours, decoration); each imports its own Google Fonts
+- `script.js` — calculation (shared by both tabs), E24 lookup, colour bands, resistor and circuit SVG drawing, tabs,
+  theme picker
 
 ## Changelog
 
@@ -103,8 +105,15 @@ supply 312.5 mA / 3.75 W, 80% efficiency.
 - 2026-11-21 — Resistor choice laid out as 3 columns (calculated | closest | closest safer). Results row renamed
   "Resistor power rating" and now shows the rating to buy plus the dissipation. Single LED tab gets the circuit
   diagram too (one resistor, one LED).
+- 2026-11-21 — Theme trial: base CSS split from looks; four themes in `themes/` (postmodern, notebook, datasheet,
+  memphis) with a temporary picker (bottom right, or `?theme=name`). All share the tomato / teal / mustard / violet
+  palette. The first "postmodern" attempt read as generic, which is why the other three exist.
 
 ## To do / watch out for
+
+- **Theme trial is open.** Once a theme is chosen: keep that file (or fold it into `style.css`), delete the others,
+  and remove the picker (`.theme-picker` in `index.html` / `style.css`, the theme block in `script.js`).
+- Memphis: the confetti background runs behind the title, subtitle and footer text; may need calming down if chosen.
 
 - Slider maxima (12 series, 10 parallel) are arbitrary; raise them in `index.html` if needed. Large arrays make the
   diagram small on phones.
