@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resistance Calculator for running LEDs</title>
+  <meta name="description" content="A handy tool to calculate the resistor required to control voltage and current for LEDs">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Resistance Calculator for running LEDs</h1>
+      <p class="subtitle">A handy tool to calculate the resistor required to control voltage and current for LEDs.</p>
+    </header>
+
+    <section class="card">
+      <h2>Inputs</h2>
+
+      <fieldset>
+        <legend>Power source &nbsp;<span class="sym">V<sub>source</sub></span></legend>
+        <div class="options" data-group="vsource">
+          <label><input type="radio" name="vsource" value="5" checked> USB 5 V</label>
+          <label><input type="radio" name="vsource" value="12"> Wall adaptor 12 V</label>
+          <label><input type="radio" name="vsource" value="custom"> Custom
+            <input type="number" id="vsource-custom" step="any" min="0" placeholder="V" disabled></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>LED power &nbsp;<span class="sym">P</span></legend>
+        <div class="options" data-group="power">
+          <label><input type="radio" name="power" value="1" checked> 1 W</label>
+          <label><input type="radio" name="power" value="3"> 3 W</label>
+          <label><input type="radio" name="power" value="custom"> Custom
+            <input type="number" id="power-custom" step="any" min="0" placeholder="W" disabled></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>LED forward voltage &nbsp;<span class="sym">V<sub>LED</sub></span></legend>
+        <div class="options" data-group="vled">
+          <label><input type="radio" name="vled" value="3.2" checked> 3.2 V</label>
+          <label><input type="radio" name="vled" value="custom"> Custom
+            <input type="number" id="vled-custom" step="any" min="0" placeholder="V" disabled></label>
+        </div>
+      </fieldset>
+    </section>
+
+    <section class="card">
+      <h2>Results</h2>
+      <p id="error" class="error" hidden></p>
+
+      <div id="results">
+        <table class="calc">
+          <tr>
+            <th>LED current</th>
+            <td class="formula">I<sub>LED</sub> = P / V<sub>LED</sub></td>
+            <td id="out-i" class="value"></td>
+          </tr>
+          <tr>
+            <th>Voltage to drop</th>
+            <td class="formula">&Delta;V = V<sub>source</sub> &minus; V<sub>LED</sub></td>
+            <td id="out-dv" class="value"></td>
+          </tr>
+          <tr>
+            <th>Required resistance</th>
+            <td class="formula">R = &Delta;V / I<sub>LED</sub></td>
+            <td id="out-r" class="value"></td>
+          </tr>
+          <tr>
+            <th>Resistor power</th>
+            <td class="formula">P<sub>R</sub> = &Delta;V &times; I<sub>LED</sub></td>
+            <td id="out-pr" class="value"></td>
+          </tr>
+        </table>
+
+        <h3>Closest standard resistor (E24, &plusmn;5%)</h3>
+        <div class="resistor-row">
+          <svg id="resistor-svg" viewBox="0 0 320 80" role="img" aria-label="Resistor colour bands"></svg>
+          <div>
+            <p class="big" id="out-std"></p>
+            <p id="out-bands" class="bands"></p>
+            <p id="out-std-note" class="note"></p>
+          </div>
+        </div>
+
+        <p id="out-higher" class="note"></p>
+        <p id="out-rating" class="note"></p>
+      </div>
+    </section>
+
+    <footer>
+      <p>Notes: a resistor is a simple way to limit LED current, but it wastes &Delta;V &times; I as heat. For high-power LEDs
+        (1 W and up) a constant-current driver is usually more efficient. The LED forward voltage varies between parts &mdash;
+        check your datasheet.</p>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

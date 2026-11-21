@@ -7,3 +7,5 @@ Welcome to yet_another_web_page of mine !
 [Text to Braille Converter](./TextToBraille/index.html)
 
 [Image Filter play](./ImageFilter/ImageFilterPage/index.html)
+
+[Resistance Calculator for running LEDs](./ResCalc/index.html)
