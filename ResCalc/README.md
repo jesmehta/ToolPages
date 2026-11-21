@@ -13,8 +13,12 @@ in one place.
 
 ## What it does
 
-The page has two tabs. **Single LED** is one LED and one resistor. **Multiple LEDs** is an array of LED
-strings (open it directly with `index.html#multi`).
+The page has four tabs; each can be opened directly with a hash:
+
+1. **Single LED** (`index.html`) — one LED and one resistor.
+2. **Multiple LEDs** (`#multi`) — an array of LED strings.
+3. **Equivalent resistance** (`#equiv`) — combine resistors in series and parallel.
+4. **Resistor finder** (`#finder`) — type a value, see the colour bands to look for.
 
 ### Single LED
 
@@ -70,6 +74,27 @@ current/power. If the string needs more voltage than the source, it says the max
 Defaults: R = 7.68 Ω, closest 7.5 Ω (Violet–Green–Gold–Gold), up 8.2 Ω (Grey–Red–Gold–Gold), 750 mW each → 2 W,
 supply 312.5 mA / 3.75 W, 80% efficiency.
 
+### Equivalent resistance
+
+The network is a chain of **blocks in series**; each block holds **one or more resistors in parallel**
+(e.g. 100 Ω + (220 Ω ∥ 220 Ω) = 210 Ω). Buttons add a resistor to a block ("+ parallel"), add a block
+("+ Add block in series"), or remove either. The diagram (terminals A and B) redraws live, with each resistor
+in its own colour bands.
+
+- Block: R = 1 / (1/R1 + 1/R2 + …)
+- Total: R_eq = R_block1 + R_block2 + …
+
+Results show the working per block, the total, and the closest E24 value with its bands.
+
+### Resistor finder
+
+Type a value, choose 4-band (2 digits) or 5-band (3 digits) and a tolerance (gold ±5% default for 4-band,
+brown ±1% for 5-band). Shows a large resistor drawing and a band-by-band key (digit / multiplier / tolerance).
+Notes say when the value had to be rounded to fit the digits, and (4-band only) when it isn't an E24 value.
+
+**Value input** (both new tabs): `220`, `4.7k`, `4k7`, `4R7`, `1M`, `2.2 kΩ`, `470 ohm`. `m`/`M` both mean mega.
+Bad values get a red outline and an error message instead of results.
+
 ## Design decisions
 
 - **E24 series**: the common ±5% range that hobby resistor kits are sold in. 4-band codes match it (two
@@ -84,6 +109,11 @@ supply 312.5 mA / 3.75 W, 80% efficiency.
 - **Each tab has its own inputs**, so the multiple tab can default to 12 V while the single tab keeps 5 V.
   Both tabs run the same `calculate()`; the single tab is n_series = n_parallel = 1.
 - **Sliders go down to 0** as asked; at 0 the diagram shows "No LEDs" and the results ask for at least 1.
+- **Equivalent resistance as "series of parallel blocks"**: covers most real hobby networks with a simple UI.
+  Arbitrary nesting (parallel of series of parallel…) would need a tree editor; not worth it yet.
+- **Values typed as text** (not number boxes) so `4k7` and `2.2k` work the way they're printed on parts lists.
+- **One band encoder** (`bandCode`) for 2 or 3 digits; colour bands everywhere use it. Multiplier is limited to
+  silver (×0.01) … white (×1G); outside that the finder says it can't be shown.
 - **No libraries**: unlike the other ToolPages tools, this needs no canvas drawing, so p5.js isn't used. The resistor
   is a small inline SVG.
 
@@ -92,8 +122,9 @@ supply 312.5 mA / 3.75 W, 80% efficiency.
 - `index.html` — page structure and inputs
 - `style.css` — base layout and plain light/dark colours
 - `themes/*.css` — visual themes layered on top of the base (fonts, colours, decoration); each imports its own Google Fonts
-- `script.js` — calculation (shared by both tabs), E24 lookup, colour bands, resistor and circuit SVG drawing, tabs,
-  theme picker
+- `themes/postmodern-bg.svg` — the postmodern theme's faint electrical-symbol background tile
+- `script.js` — LED calculation (shared by tabs 1–2), equivalent-resistance network, resistor finder, value parsing,
+  E24 lookup, colour-band encoding, resistor / circuit / network SVG drawing, tabs, theme picker
 
 ## Changelog
 
@@ -108,12 +139,17 @@ supply 312.5 mA / 3.75 W, 80% efficiency.
 - 2026-11-21 — Theme trial: base CSS split from looks; four themes in `themes/` (postmodern, notebook, datasheet,
   memphis) with a temporary picker (bottom right, or `?theme=name`). All share the tomato / teal / mustard / violet
   palette. The first "postmodern" attempt read as generic, which is why the other three exist.
+- 2026-11-21 — Postmodern background: faint Memphis-style tile of electrical symbols replaces the dot grid.
+- 2026-11-21 — Added tabs 3 (Equivalent resistance: series of parallel blocks, live network diagram) and
+  4 (Resistor finder: value → 4/5-band colour code with a band-by-band key). Text value input with k/M/RKM parsing.
 
 ## To do / watch out for
 
 - **Theme trial is open.** Once a theme is chosen: keep that file (or fold it into `style.css`), delete the others,
   and remove the picker (`.theme-picker` in `index.html` / `style.css`, the theme block in `script.js`).
 - Memphis: the confetti background runs behind the title, subtitle and footer text; may need calming down if chosen.
+- The page title and subtitle still talk only about LEDs, but tabs 3 and 4 are general resistor tools.
+- Possible: a reverse finder (pick colours → value), E96 suggestions for 5-band, nested networks.
 
 - Slider maxima (12 series, 10 parallel) are arbitrary; raise them in `index.html` if needed. Large arrays make the
   diagram small on phones.
