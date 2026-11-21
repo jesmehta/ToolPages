@@ -19,6 +19,8 @@
     <nav class="tabs" role="tablist">
       <button role="tab" id="tab-single" aria-controls="panel-single" aria-selected="true">Single LED</button>
       <button role="tab" id="tab-multi" aria-controls="panel-multi" aria-selected="false">Multiple LEDs</button>
+      <button role="tab" id="tab-equiv" aria-controls="panel-equiv" aria-selected="false">Equivalent resistance</button>
+      <button role="tab" id="tab-finder" aria-controls="panel-finder" aria-selected="false">Resistor finder</button>
     </nav>
 
     <!-- =================== Tab 1: Single LED =================== -->
@@ -248,6 +250,89 @@
             <p class="cg-cur" id="m-cur-closest"></p>
             <p class="cg-cur" id="m-cur-up"></p>
           </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- =================== Tab 3: Equivalent resistance =================== -->
+    <div role="tabpanel" id="panel-equiv" aria-labelledby="tab-equiv" hidden>
+      <section class="card">
+        <h2>Resistors</h2>
+        <p class="note">Resistors inside a block are in <strong>parallel</strong>; the blocks are joined in
+          <strong>series</strong>. Type values like <code>220</code>, <code>4.7k</code>, <code>4k7</code> or <code>1M</code>.</p>
+        <div id="e-blocks" class="blocks"></div>
+        <button type="button" class="btn" id="e-add-block">+ Add block in series</button>
+      </section>
+
+      <section class="card">
+        <h2>Circuit</h2>
+        <svg id="e-diagram" class="diagram" role="img" aria-label="Diagram of the resistor network"></svg>
+      </section>
+
+      <section class="card">
+        <h2>Results</h2>
+        <p id="e-error" class="error" hidden></p>
+
+        <div id="e-results">
+          <table class="calc" id="e-working"></table>
+
+          <h3>Equivalent resistance</h3>
+          <div class="choice-grid two">
+            <div class="cg-head">Equivalent</div>
+            <div class="cg-head">Closest standard (E24)</div>
+
+            <p class="cg-val" id="e-out-total"></p>
+            <p class="cg-val accent" id="e-out-closest"></p>
+
+            <div class="cg-bands cg-none">&mdash;</div>
+            <div class="cg-bands">
+              <svg id="e-svg-closest" viewBox="0 0 320 80" role="img" aria-label="Closest standard resistor colour bands"></svg>
+              <p id="e-bands-closest" class="bands"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- =================== Tab 4: Resistor finder =================== -->
+    <div role="tabpanel" id="panel-finder" aria-labelledby="tab-finder" hidden>
+      <section class="card">
+        <h2>Resistor</h2>
+
+        <fieldset>
+          <legend><label for="f-value">Resistance</label></legend>
+          <div class="options">
+            <input type="text" id="f-value" class="r-input wide" value="220" autocomplete="off" spellcheck="false"
+                   placeholder="e.g. 220, 4.7k, 4k7, 1M">
+            <span class="note" id="f-parsed"></span>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Bands</legend>
+          <div class="options">
+            <label><input type="radio" name="f-bands" value="4" checked> 4-band (2 digits)</label>
+            <label><input type="radio" name="f-bands" value="5"> 5-band (3 digits)</label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend><label for="f-tol">Tolerance</label></legend>
+          <select id="f-tol"></select>
+        </fieldset>
+      </section>
+
+      <section class="card">
+        <h2>What to look for</h2>
+        <p id="f-error" class="error" hidden></p>
+
+        <div id="f-results">
+          <svg id="f-svg" class="finder-svg" viewBox="0 0 320 80" role="img" aria-label="Resistor colour bands to look for"></svg>
+          <p class="cg-val accent finder-value" id="f-out-value"></p>
+          <ol id="f-band-list" class="band-list"></ol>
+          <p class="note" id="f-note"></p>
+          <p class="note">Read from the end where the bands are bunched together. The tolerance band sits on its own,
+            a little apart, at the other end.</p>
         </div>
       </section>
     </div>

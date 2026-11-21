@@ -255,3 +255,105 @@ footer { color: var(--muted); font-size: 0.9rem; }
 }
 
 .theme-picker select { font: inherit; }
+
+/* ---------- shared: buttons, text inputs, select ---------- */
+
+.btn {
+  font: inherit;
+  font-weight: 600;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.btn.small { font-size: 0.85rem; padding: 3px 10px; }
+
+.btn-x {
+  font: inherit;
+  line-height: 1;
+  width: 24px; height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+.btn-x:hover { color: var(--accent); }
+
+.r-input {
+  width: 84px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.r-input.wide { width: 160px; }
+.r-input.invalid { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+
+select {
+  font: inherit;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+code { font-size: 0.9em; }
+
+/* ---------- tab 3: equivalent resistance ---------- */
+
+.blocks { display: flex; flex-direction: column; gap: 10px; margin: 12px 0 14px; }
+
+.block {
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 8px 12px 10px;
+}
+
+.block-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.block-head em { font-weight: 400; color: var(--muted); }
+
+.block-items { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+.r-item { display: inline-flex; align-items: center; gap: 2px; }
+
+.choice-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 520px; margin: 0 auto; }
+
+/* ---------- tab 4: resistor finder ---------- */
+
+.finder-svg { display: block; width: 100%; max-width: 460px; height: auto; margin: 0 auto; }
+.finder-value { text-align: center; }
+
+.band-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px auto;
+  max-width: 420px;
+  display: grid;
+  gap: 6px;
+}
+
+.band-list li { display: flex; align-items: center; gap: 10px; }
+
+.swatch {
+  flex: none;
+  width: 28px; height: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  border-radius: 3px;
+}

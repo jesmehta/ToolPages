@@ -75,17 +75,52 @@ function suggestedRating(p) {
   return POWER_RATINGS.find(w => w >= p * 2) ?? null;
 }
 
+// Encodes r as `digits` significant digits + a multiplier band.
+// Returns { digitVals, digitBands, exp, mult, value } or null if it can't be shown
+// (multiplier bands only run from silver ×0.01 to white ×1G).
+function bandCode(r, digits = 2) {
+  if (!(r > 0) || !isFinite(r)) return null;
+  let exp = Math.floor(Math.log10(r) + 1e-9) - (digits - 1);
+  let n = Math.round(r / Math.pow(10, exp));
+  if (n >= Math.pow(10, digits)) { exp += 1; n = Math.round(r / Math.pow(10, exp)); }
+  if (exp < -2 || exp > 9) return null;
+  const digitVals = String(n).padStart(digits, "0").split("").map(Number);
+  const mult = exp === -2 ? SILVER : exp === -1 ? GOLD : COLOURS[exp];
+  const value = +(n * Math.pow(10, exp)).toPrecision(digits + 1);
+  return { digitVals, digitBands: digitVals.map(d => COLOURS[d]), exp, mult, value };
+}
+
 // 4-band code: digit, digit, multiplier, tolerance (gold = ±5%).
 function colourBands(r) {
-  const exp = Math.floor(Math.log10(r) + 1e-9) - 1;   // so that r / 10^exp is two digits
-  const twoDigits = Math.round(r / Math.pow(10, exp));
-  const d1 = Math.floor(twoDigits / 10);
-  const d2 = twoDigits % 10;
-  let mult;
-  if (exp === -1) mult = GOLD;
-  else if (exp === -2) mult = SILVER;
-  else mult = COLOURS[exp];
-  return [COLOURS[d1], COLOURS[d2], mult, GOLD];
+  const c = bandCode(r, 2);
+  return c ? [...c.digitBands, c.mult, GOLD] : null;
+}
+
+// Tolerance bands. Brown and red are common on 5-band (1%, 2%) resistors.
+const TOLERANCES = [
+  { band: GOLD,       text: "±5%" },
+  { band: SILVER,     text: "±10%" },
+  { band: COLOURS[1], text: "±1%" },
+  { band: COLOURS[2], text: "±2%" },
+  { band: COLOURS[5], text: "±0.5%" },
+  { band: COLOURS[6], text: "±0.25%" },
+  { band: COLOURS[7], text: "±0.1%" },
+  { band: COLOURS[8], text: "±0.05%" },
+];
+
+const MULT_TEXT = { "-2": "× 0.01", "-1": "× 0.1", 0: "× 1", 1: "× 10", 2: "× 100", 3: "× 1k",
+                    4: "× 10k", 5: "× 100k", 6: "× 1M", 7: "× 10M", 8: "× 100M", 9: "× 1G" };
+
+// Parses "220", "4.7k", "4k7", "4R7", "1M", "2.2 kΩ", "470 ohm". Returns ohms or NaN.
+// m/M both mean mega here: nobody buys milliohm resistors from a colour code.
+function parseOhms(str) {
+  const s = String(str).trim().toLowerCase().replace(/ohms?|ω|Ω/g, "").replace(/\s+/g, "");
+  const mult = { "": 1, r: 1, k: 1e3, m: 1e6, g: 1e9 };
+  let m = s.match(/^(\d+(?:\.\d*)?|\.\d+)([rkmg]?)$/);
+  if (m) return parseFloat(m[1]) * mult[m[2]];
+  m = s.match(/^(\d*)([rkmg])(\d+)$/);            // RKM notation: 4k7, 4R7, k47
+  if (m) return parseFloat((m[1] || "0") + "." + m[3]) * mult[m[2]];
+  return NaN;
 }
 
 // ---------- formatting ----------
@@ -119,8 +154,9 @@ const bandNames = bands => bands.map(b => b.name).join(" – ");
 
 // ---------- drawing: single resistor ----------
 
+// Draws a large resistor. 4 or 5 bands; the last (tolerance) band sits apart.
 function drawResistor(svgId, bands) {
-  const xs = [100, 128, 156, 214];
+  const xs = bands.length === 5 ? [94, 118, 142, 166, 214] : [100, 128, 156, 214];
   let s = `
     <line x1="0" y1="40" x2="320" y2="40" stroke="var(--wire)" stroke-width="5"/>
     <rect x="70" y="14" width="180" height="52" rx="22" fill="var(--resistor-body)" stroke="rgba(0,0,0,0.25)"/>`;
@@ -294,19 +330,262 @@ function updateMulti() {
   calculate("m", nSeries, nParallel);
 }
 
+// ---------- tab 3: equivalent resistance ----------
+//
+// Model: a list of blocks joined in series; each block holds one or more
+// resistors in parallel. Values are kept as the text the user typed.
+
+let equivBlocks = [["100"], ["220", "220"]];
+
+function parallelOf(rs) {
+  return 1 / rs.reduce((sum, r) => sum + 1 / r, 0);
+}
+
+function renderEquivInputs() {
+  const host = $("e-blocks");
+  host.innerHTML = equivBlocks.map((block, b) => `
+    <div class="block">
+      <div class="block-head">
+        <span>Block ${b + 1}${block.length > 1 ? " <em>(parallel)</em>" : ""}</span>
+        ${equivBlocks.length > 1
+          ? `<button type="button" class="btn-x" data-action="del-block" data-b="${b}" aria-label="Remove block ${b + 1}">×</button>`
+          : ""}
+      </div>
+      <div class="block-items">
+        ${block.map((v, i) => `
+          <span class="r-item">
+            <input type="text" class="r-input" value="${v.replace(/"/g, "&quot;")}" data-b="${b}" data-i="${i}"
+                   autocomplete="off" spellcheck="false" aria-label="Block ${b + 1} resistor ${i + 1}">
+            ${block.length > 1
+              ? `<button type="button" class="btn-x" data-action="del-r" data-b="${b}" data-i="${i}" aria-label="Remove resistor">×</button>`
+              : ""}
+          </span>`).join("")}
+        <button type="button" class="btn small" data-action="add-r" data-b="${b}">+ parallel</button>
+      </div>
+    </div>`).join("");
+}
+
+// Resistor symbol at (cx, y) with optional colour bands, plus a value label beneath.
+function smallResistorSvg(cx, y, bands, label) {
+  const w = 56, x = cx - w / 2;
+  let s = `<rect x="${x}" y="${y - 9}" width="${w}" height="18" rx="6" fill="var(--resistor-body)" stroke="rgba(0,0,0,0.3)"/>`;
+  if (bands) {
+    [x + 10, x + 18, x + 26, x + 42].forEach((bx, i) => {
+      s += `<rect x="${bx}" y="${y - 9}" width="5" height="18" fill="${bands[i].hex}"/>`;
+    });
+  }
+  s += `<text x="${cx}" y="${y + 24}" class="dg-small" text-anchor="middle">${label}</text>`;
+  return s;
+}
+
+function drawNetwork(svgId, blocks) {
+  const svg = $(svgId);
+  const BLOCK_W = 110, ROW = 50, PAD = 26;
+  const maxN = Math.max(...blocks.map(b => b.length));
+  const H = maxN * ROW + 34;
+  const midY = H / 2 - 4;
+  const W = PAD * 2 + blocks.length * BLOCK_W;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.style.maxWidth = `${Math.max(W * 1.3, 320)}px`;
+
+  const wire = `stroke="var(--wire)" stroke-width="2.5" fill="none"`;
+  const dot = (x, y) => `<circle cx="${x}" cy="${y}" r="3.5" fill="var(--wire)"/>`;
+  let s = "";
+
+  // terminals
+  s += `<circle cx="${PAD - 10}" cy="${midY}" r="5" fill="var(--card, #fff)" stroke="var(--wire)" stroke-width="2.5"/>`;
+  s += `<text x="${PAD - 10}" y="${midY - 12}" class="dg-label" text-anchor="middle">A</text>`;
+  s += `<line x1="${PAD - 5}" y1="${midY}" x2="${PAD}" y2="${midY}" ${wire}/>`;
+
+  blocks.forEach((rs, b) => {
+    const xl = PAD + b * BLOCK_W, xr = xl + BLOCK_W, cx = (xl + xr) / 2;
+    const label = r => (r > 0 ? fmtOhms(r) : "?");
+    const bandsOf = r => (r > 0 ? colourBands(r) : null);
+    if (rs.length === 1) {
+      s += `<line x1="${xl}" y1="${midY}" x2="${xr}" y2="${midY}" ${wire}/>`;
+      s += smallResistorSvg(cx, midY, bandsOf(rs[0]), label(rs[0]));
+      return;
+    }
+    const ys = rs.map((_, k) => midY + (k - (rs.length - 1) / 2) * ROW);
+    const xa = xl + 10, xb = xr - 10;
+    s += `<line x1="${xl}" y1="${midY}" x2="${xa}" y2="${midY}" ${wire}/>`;
+    s += `<line x1="${xb}" y1="${midY}" x2="${xr}" y2="${midY}" ${wire}/>`;
+    s += `<line x1="${xa}" y1="${ys[0]}" x2="${xa}" y2="${ys[ys.length - 1]}" ${wire}/>`;
+    s += `<line x1="${xb}" y1="${ys[0]}" x2="${xb}" y2="${ys[ys.length - 1]}" ${wire}/>`;
+    s += dot(xa, midY) + dot(xb, midY);
+    rs.forEach((r, k) => {
+      s += `<line x1="${xa}" y1="${ys[k]}" x2="${xb}" y2="${ys[k]}" ${wire}/>`;
+      s += smallResistorSvg(cx, ys[k], bandsOf(r), label(r));
+    });
+  });
+
+  const xEnd = PAD + blocks.length * BLOCK_W;
+  s += `<line x1="${xEnd}" y1="${midY}" x2="${xEnd + 5}" y2="${midY}" ${wire}/>`;
+  s += `<circle cx="${xEnd + 10}" cy="${midY}" r="5" fill="var(--card, #fff)" stroke="var(--wire)" stroke-width="2.5"/>`;
+  s += `<text x="${xEnd + 10}" y="${midY - 12}" class="dg-label" text-anchor="middle">B</text>`;
+  svg.innerHTML = s;
+}
+
+function updateEquiv() {
+  const values = equivBlocks.map(block => block.map(parseOhms));
+
+  // mark bad inputs
+  let bad = 0;
+  document.querySelectorAll("#e-blocks .r-input").forEach(el => {
+    const r = values[el.dataset.b][el.dataset.i];
+    const ok = r > 0;
+    el.classList.toggle("invalid", !ok);
+    if (!ok) bad++;
+  });
+
+  drawNetwork("e-diagram", values);
+
+  const err = $("e-error"), results = $("e-results");
+  if (bad) {
+    err.textContent = `${bad} value${bad > 1 ? "s" : ""} not understood. Use numbers like 220, 4.7k, 4k7 or 1M (all above zero).`;
+    err.hidden = false;
+    results.hidden = true;
+    return;
+  }
+  err.hidden = true;
+  results.hidden = false;
+
+  const blockR = values.map(rs => (rs.length === 1 ? rs[0] : parallelOf(rs)));
+  const total = blockR.reduce((a, b) => a + b, 0);
+
+  let rows = values.map((rs, b) => `
+    <tr>
+      <th>Block ${b + 1}${rs.length > 1 ? " (parallel)" : ""}</th>
+      <td class="formula">${rs.length > 1 ? "1 / (" + rs.map(r => "1/" + fmtOhms(r)).join(" + ") + ")" : "single resistor"}</td>
+      <td class="value">${fmtOhms(blockR[b])}</td>
+    </tr>`).join("");
+  if (values.length > 1) {
+    rows += `
+    <tr>
+      <th>Blocks in series</th>
+      <td class="formula">${blockR.map(fmtOhms).join(" + ")}</td>
+      <td class="value">${fmtOhms(total)}</td>
+    </tr>`;
+  }
+  $("e-working").innerHTML = rows;
+
+  setText("e-out-total", fmtOhms(total));
+  const closest = closestStandard(total);
+  const bands = colourBands(closest);
+  setText("e-out-closest", fmtOhms(closest));
+  drawResistor("e-svg-closest", bands);
+  setText("e-bands-closest", bandNames(bands));
+}
+
+$("e-blocks").addEventListener("input", e => {
+  const el = e.target;
+  if (!el.classList.contains("r-input")) return;
+  equivBlocks[el.dataset.b][el.dataset.i] = el.value;
+  updateEquiv();
+});
+
+$("e-blocks").addEventListener("click", e => {
+  const btn = e.target.closest("button[data-action]");
+  if (!btn) return;
+  const b = +btn.dataset.b, i = +btn.dataset.i;
+  if (btn.dataset.action === "add-r") equivBlocks[b].push(equivBlocks[b][equivBlocks[b].length - 1]);
+  if (btn.dataset.action === "del-r") equivBlocks[b].splice(i, 1);
+  if (btn.dataset.action === "del-block") equivBlocks.splice(b, 1);
+  renderEquivInputs();
+  updateEquiv();
+  // put the cursor in the resistor that was just added
+  if (btn.dataset.action === "add-r") {
+    const inputs = document.querySelectorAll(`#e-blocks .r-input[data-b="${b}"]`);
+    inputs[inputs.length - 1].select();
+  }
+});
+
+$("e-add-block").addEventListener("click", () => {
+  equivBlocks.push(["100"]);
+  renderEquivInputs();
+  updateEquiv();
+  const inputs = document.querySelectorAll("#e-blocks .r-input");
+  inputs[inputs.length - 1].select();
+});
+
+// ---------- tab 4: resistor finder ----------
+
+function fillToleranceOptions() {
+  const fiveBand = document.querySelector('input[name="f-bands"]:checked').value === "5";
+  const sel = $("f-tol");
+  const defaultText = fiveBand ? "±1%" : "±5%";
+  sel.innerHTML = TOLERANCES.map((t, i) =>
+    `<option value="${i}"${t.text === defaultText ? " selected" : ""}>${t.text} (${t.band.name})</option>`).join("");
+}
+
+function updateFinder() {
+  const r = parseOhms($("f-value").value);
+  const digits = document.querySelector('input[name="f-bands"]:checked').value === "5" ? 3 : 2;
+  const tol = TOLERANCES[+$("f-tol").value];
+  const err = $("f-error"), results = $("f-results");
+
+  $("f-value").classList.toggle("invalid", !(r > 0));
+  setText("f-parsed", r > 0 ? `= ${fmtOhms(r)}` : "");
+
+  const code = r > 0 ? bandCode(r, digits) : null;
+  if (!code) {
+    err.textContent = r > 0
+      ? `${fmtOhms(r)} is outside what a ${digits + 2}-band colour code can show.`
+      : "Type a resistance, e.g. 220, 4.7k, 4k7 or 1M.";
+    err.hidden = false;
+    results.hidden = true;
+    return;
+  }
+  err.hidden = true;
+  results.hidden = false;
+
+  const bands = [...code.digitBands, code.mult, tol.band];
+  drawResistor("f-svg", bands);
+  setText("f-out-value", `${fmtOhms(code.value)} ${tol.text}`);
+
+  const ordinal = ["1st", "2nd", "3rd"];
+  const items = code.digitBands.map((b, k) => ({ band: b, text: `${ordinal[k]} digit: ${code.digitVals[k]}` }));
+  items.push({ band: code.mult, text: `Multiplier: ${MULT_TEXT[code.exp]}` });
+  items.push({ band: tol.band, text: `Tolerance: ${tol.text}` });
+  $("f-band-list").innerHTML = items.map(it => `
+    <li><span class="swatch" style="background:${it.band.hex}"></span>
+      <strong>${it.band.name}</strong> <span class="note">${it.text}</span></li>`).join("");
+
+  const notes = [];
+  if (Math.abs(code.value - r) / r > 1e-6) {
+    notes.push(`${fmtOhms(r)} needs more than ${digits} digits, so it's shown rounded to ${fmtOhms(code.value)}.` +
+               (digits === 2 ? " A 5-band code can show 3 digits." : ""));
+  }
+  // E24 is the usual 4-band (±5%) range; 5-band parts come from finer ranges (E96 etc.).
+  const e24 = closestStandard(r);
+  if (digits === 2 && Math.abs(e24 - r) / r > 1e-6) {
+    notes.push(`${fmtOhms(r)} isn't a standard E24 value; the nearest is ${fmtOhms(e24)}.`);
+  }
+  setText("f-note", notes.join(" "));
+}
+
+document.querySelectorAll('input[name="f-bands"]').forEach(el => el.addEventListener("change", () => {
+  fillToleranceOptions();
+  updateFinder();
+}));
+$("f-value").addEventListener("input", updateFinder);
+$("f-tol").addEventListener("change", updateFinder);
+
 // ---------- tabs ----------
 
+const TABS = ["single", "multi", "equiv", "finder"];
+
 function showTab(name) {
-  for (const t of ["single", "multi"]) {
+  if (!TABS.includes(name)) name = "single";
+  for (const t of TABS) {
     const on = t === name;
     $(`tab-${t}`).setAttribute("aria-selected", on);
     $(`panel-${t}`).hidden = !on;
   }
-  history.replaceState(null, "", name === "multi" ? "#multi" : location.pathname + location.search);
+  history.replaceState(null, "", name === "single" ? location.pathname + location.search : `#${name}`);
 }
 
-$("tab-single").addEventListener("click", () => showTab("single"));
-$("tab-multi").addEventListener("click", () => showTab("multi"));
+TABS.forEach(t => $(`tab-${t}`).addEventListener("click", () => showTab(t)));
 
 // ---------- theme trial (temporary) ----------
 
@@ -336,4 +615,8 @@ document.querySelectorAll("#panel-multi input").forEach(el => el.addEventListene
 
 updateSingle();
 updateMulti();
-showTab(location.hash === "#multi" ? "multi" : "single");
+renderEquivInputs();
+updateEquiv();
+fillToleranceOptions();
+updateFinder();
+showTab(location.hash.slice(1) || "single");

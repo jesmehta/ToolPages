@@ -364,3 +364,43 @@ footer {
   .cg-head { font-size: 0.66rem; }
   .cg-bands .bands, .cg-cur { font-size: 0.72rem; }
 }
+
+/* ---------- tabs 3 & 4: buttons, inputs, blocks, band list ---------- */
+
+.btn {
+  font-family: var(--font-display);
+  border: 2px solid var(--border);
+  border-radius: 3px;
+  background: var(--card);
+  box-shadow: 3px 3px 0 var(--teal);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+
+.btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--teal); }
+.btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--teal); }
+
+.r-input, select {
+  border: 2px solid var(--border);
+  border-radius: 3px;
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+}
+
+.r-input:focus, select:focus { outline: none; box-shadow: 3px 3px 0 var(--accent); }
+.r-input.invalid { border-color: var(--accent); background: var(--error-bg); box-shadow: none; }
+
+code { font-family: var(--font-mono); font-size: 0.85em; }
+
+.block {
+  border: 2px dashed var(--border);
+  border-radius: 3px;
+  background: var(--bg);
+}
+
+.block-head { font-family: var(--font-display); }
+.block-head em { font-family: var(--font-serif); font-size: 1.05em; }
+
+.band-list li strong { font-family: var(--font-display); min-width: 4.5em; }
+.swatch { border: 2px solid var(--border); border-radius: 2px; }
+.finder-value { font-size: 1.8rem; }
