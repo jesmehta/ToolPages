@@ -1,5 +1,5 @@
 // Resistance Calculator for running LEDs
-// I = P / V_LED, dV = V_source - V_LED, R = dV / I, P_R = dV * I
+// I_LED = P_LED / V_LED, dV = V_source - V_LED, R = dV / I, P_R = dV * I
 
 const E24 = [1.0, 1.1, 1.2, 1.3, 1.5, 1.6, 1.8, 2.0, 2.2, 2.4, 2.7, 3.0,
              3.3, 3.6, 3.9, 4.3, 4.7, 5.1, 5.6, 6.2, 6.8, 7.5, 8.2, 9.1];
@@ -103,8 +103,8 @@ function trim(n) {
 
 // ---------- drawing ----------
 
-function drawResistor(bands) {
-  const svg = document.getElementById("resistor-svg");
+function drawResistor(svgId, bands) {
+  const svg = document.getElementById(svgId);
   const xs = [100, 128, 156, 214];
   let s = `
     <line x1="0" y1="40" x2="320" y2="40" stroke="var(--wire)" stroke-width="5"/>
@@ -114,6 +114,17 @@ function drawResistor(bands) {
             <title>${b.name}</title></rect>`;
   });
   svg.innerHTML = s;
+}
+
+function showStandard(key, value, dv, iTarget) {
+  const bands = colourBands(value);
+  drawResistor(`svg-${key}`, bands);
+  document.getElementById(`out-${key}`).textContent = fmtOhms(value);
+  document.getElementById(`bands-${key}`).textContent = bands.map(b => b.name).join(" – ");
+  const iActual = dv / value;
+  const pct = (iActual / iTarget - 1) * 100;
+  document.getElementById(`note-${key}`).textContent =
+    `LED current ${fmtAmps(iActual)} (${pct > 0 ? "+" : ""}${trim(pct)}% vs target).`;
 }
 
 // ---------- main ----------
@@ -152,22 +163,20 @@ function update() {
   document.getElementById("out-r").textContent = fmtOhms(r);
   document.getElementById("out-pr").textContent = fmtWatts(pr);
 
-  const std = closestStandard(r);
-  const bands = colourBands(std);
-  drawResistor(bands);
-  document.getElementById("out-std").textContent = fmtOhms(std);
-  document.getElementById("out-bands").textContent = bands.map(b => b.name).join(" – ");
+  document.getElementById("out-req").textContent = fmtOhms(r);
 
-  const iStd = dv / std;
-  document.getElementById("out-std-note").textContent =
-    `With ${fmtOhms(std)} the LED current is ${fmtAmps(iStd)} ` +
-    `(${iStd > i ? "+" : ""}${trim((iStd / i - 1) * 100)}% vs target).`;
+  const closest = closestStandard(r);
+  const up = nextHigherStandard(r);
+  showStandard("closest", closest, dv, i);
+  showStandard("up", up, dv, i);
 
-  const higher = nextHigherStandard(r);
-  document.getElementById("out-higher").textContent = higher !== std
-    ? `Safer choice: the closest value is below R, so it lets slightly more current through. ` +
-      `The next value up, ${fmtOhms(higher)} (${colourBands(higher).map(b => b.name).join(" – ")}), keeps the current at or below target.`
-    : "";
+  if (closest < r) {
+    document.getElementById("note-closest").textContent +=
+      " Below R, so slightly more current than target flows.";
+  }
+  if (up === closest) {
+    document.getElementById("note-up").textContent += " Same as the closest standard.";
+  }
 
   const rating = suggestedRating(pr);
   document.getElementById("out-rating").textContent = rating

@@ -28,7 +28,7 @@
       </fieldset>
 
       <fieldset>
-        <legend>LED power &nbsp;<span class="sym">P</span></legend>
+        <legend>LED power &nbsp;<span class="sym">P<sub>LED</sub></span></legend>
         <div class="options" data-group="power">
           <label><input type="radio" name="power" value="1" checked> 1 W</label>
           <label><input type="radio" name="power" value="3"> 3 W</label>
@@ -55,7 +55,7 @@
         <table class="calc">
           <tr>
             <th>LED current</th>
-            <td class="formula">I<sub>LED</sub> = P / V<sub>LED</sub></td>
+            <td class="formula">I<sub>LED</sub> = P<sub>LED</sub> / V<sub>LED</sub></td>
             <td id="out-i" class="value"></td>
           </tr>
           <tr>
@@ -75,17 +75,37 @@
           </tr>
         </table>
 
-        <h3>Closest standard resistor (E24, &plusmn;5%)</h3>
-        <div class="resistor-row">
-          <svg id="resistor-svg" viewBox="0 0 320 80" role="img" aria-label="Resistor colour bands"></svg>
-          <div>
-            <p class="big" id="out-std"></p>
-            <p id="out-bands" class="bands"></p>
-            <p id="out-std-note" class="note"></p>
+        <h3>Resistor choice (standard E24 values, &plusmn;5%)</h3>
+        <div class="choice required">
+          <div class="choice-label">Required (calculated)</div>
+          <p class="big" id="out-req"></p>
+          <p class="note">Not usually available off the shelf &mdash; pick a standard value below.</p>
+        </div>
+
+        <div class="choice">
+          <div class="choice-label">Closest standard</div>
+          <div class="resistor-row">
+            <svg id="svg-closest" viewBox="0 0 320 80" role="img" aria-label="Closest standard resistor colour bands"></svg>
+            <div>
+              <p class="big" id="out-closest"></p>
+              <p id="bands-closest" class="bands"></p>
+              <p id="note-closest" class="note"></p>
+            </div>
           </div>
         </div>
 
-        <p id="out-higher" class="note"></p>
+        <div class="choice">
+          <div class="choice-label">Closest standard up (safer)</div>
+          <div class="resistor-row">
+            <svg id="svg-up" viewBox="0 0 320 80" role="img" aria-label="Closest standard up resistor colour bands"></svg>
+            <div>
+              <p class="big" id="out-up"></p>
+              <p id="bands-up" class="bands"></p>
+              <p id="note-up" class="note"></p>
+            </div>
+          </div>
+        </div>
+
         <p id="out-rating" class="note"></p>
       </div>
     </section>
