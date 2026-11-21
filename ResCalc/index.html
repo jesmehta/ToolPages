@@ -297,43 +297,27 @@
     <!-- =================== Tab 4: Resistor finder =================== -->
     <div role="tabpanel" id="panel-finder" aria-labelledby="tab-finder" hidden>
       <section class="card">
-        <h2>Resistor</h2>
+        <h2>Resistor finder</h2>
 
-        <fieldset>
-          <legend><label for="f-value">Resistance</label></legend>
-          <div class="options">
-            <input type="text" id="f-value" class="r-input wide" value="220" autocomplete="off" spellcheck="false"
-                   placeholder="e.g. 220, 4.7k, 4k7, 1M">
-            <span class="note" id="f-parsed"></span>
+        <div class="choice-grid finder">
+          <label class="cg-head" for="f-value">Resistor needed</label>
+          <div class="cg-head">Closest standard (E24)</div>
+          <div class="cg-head">Look for</div>
+
+          <div class="finder-input">
+            <input type="text" id="f-value" class="r-input" value="220" autocomplete="off" spellcheck="false"
+                   placeholder="e.g. 4.7k">
+            <p class="note" id="f-parsed"></p>
           </div>
-        </fieldset>
-
-        <fieldset>
-          <legend>Bands</legend>
-          <div class="options">
-            <label><input type="radio" name="f-bands" value="4" checked> 4-band (2 digits)</label>
-            <label><input type="radio" name="f-bands" value="5"> 5-band (3 digits)</label>
+          <p class="cg-val accent" id="f-out-closest"></p>
+          <div class="cg-bands">
+            <svg id="f-svg" viewBox="0 0 320 80" role="img" aria-label="Colour bands of the closest standard resistor"></svg>
+            <p id="f-bands" class="bands"></p>
           </div>
-        </fieldset>
-
-        <fieldset>
-          <legend><label for="f-tol">Tolerance</label></legend>
-          <select id="f-tol"></select>
-        </fieldset>
-      </section>
-
-      <section class="card">
-        <h2>What to look for</h2>
-        <p id="f-error" class="error" hidden></p>
-
-        <div id="f-results">
-          <svg id="f-svg" class="finder-svg" viewBox="0 0 320 80" role="img" aria-label="Resistor colour bands to look for"></svg>
-          <p class="cg-val accent finder-value" id="f-out-value"></p>
-          <ol id="f-band-list" class="band-list"></ol>
-          <p class="note" id="f-note"></p>
-          <p class="note">Read from the end where the bands are bunched together. The tolerance band sits on its own,
-            a little apart, at the other end.</p>
         </div>
+
+        <p class="note">Type values like <code>220</code>, <code>4.7k</code>, <code>4k7</code> or <code>1M</code>.
+          4-band, &plusmn;5% (gold). Read from the end where the bands are bunched together.</p>
       </section>
     </div>
 

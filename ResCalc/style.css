@@ -256,7 +256,7 @@ footer { color: var(--muted); font-size: 0.9rem; }
 
 .theme-picker select { font: inherit; }
 
-/* ---------- shared: buttons, text inputs, select ---------- */
+/* ---------- shared: buttons, text inputs ---------- */
 
 .btn {
   font: inherit;
@@ -295,17 +295,8 @@ footer { color: var(--muted); font-size: 0.9rem; }
   font: inherit;
 }
 
-.r-input.wide { width: 160px; }
 .r-input.invalid { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
 
-select {
-  font: inherit;
-  padding: 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg);
-  color: var(--text);
-}
 
 code { font-size: 0.9em; }
 
@@ -337,23 +328,6 @@ code { font-size: 0.9em; }
 
 /* ---------- tab 4: resistor finder ---------- */
 
-.finder-svg { display: block; width: 100%; max-width: 460px; height: auto; margin: 0 auto; }
-.finder-value { text-align: center; }
-
-.band-list {
-  list-style: none;
-  padding: 0;
-  margin: 10px auto;
-  max-width: 420px;
-  display: grid;
-  gap: 6px;
-}
-
-.band-list li { display: flex; align-items: center; gap: 10px; }
-
-.swatch {
-  flex: none;
-  width: 28px; height: 18px;
-  border: 1px solid rgba(0, 0, 0, 0.35);
-  border-radius: 3px;
-}
+.choice-grid.finder { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.3fr); }
+.finder-input .r-input { width: 100%; max-width: 160px; text-align: center; font-size: 1.1rem; }
+.finder-input .note { margin: 4px 0 0; font-size: 0.82rem; }

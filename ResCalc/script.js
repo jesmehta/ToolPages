@@ -96,20 +96,6 @@ function colourBands(r) {
   return c ? [...c.digitBands, c.mult, GOLD] : null;
 }
 
-// Tolerance bands. Brown and red are common on 5-band (1%, 2%) resistors.
-const TOLERANCES = [
-  { band: GOLD,       text: "±5%" },
-  { band: SILVER,     text: "±10%" },
-  { band: COLOURS[1], text: "±1%" },
-  { band: COLOURS[2], text: "±2%" },
-  { band: COLOURS[5], text: "±0.5%" },
-  { band: COLOURS[6], text: "±0.25%" },
-  { band: COLOURS[7], text: "±0.1%" },
-  { band: COLOURS[8], text: "±0.05%" },
-];
-
-const MULT_TEXT = { "-2": "× 0.01", "-1": "× 0.1", 0: "× 1", 1: "× 10", 2: "× 100", 3: "× 1k",
-                    4: "× 10k", 5: "× 100k", 6: "× 1M", 7: "× 10M", 8: "× 100M", 9: "× 1G" };
 
 // Parses "220", "4.7k", "4k7", "4R7", "1M", "2.2 kΩ", "470 ohm". Returns ohms or NaN.
 // m/M both mean mega here: nobody buys milliohm resistors from a colour code.
@@ -154,9 +140,9 @@ const bandNames = bands => bands.map(b => b.name).join(" – ");
 
 // ---------- drawing: single resistor ----------
 
-// Draws a large resistor. 4 or 5 bands; the last (tolerance) band sits apart.
+// Draws a large 4-band resistor; the tolerance band sits apart.
 function drawResistor(svgId, bands) {
-  const xs = bands.length === 5 ? [94, 118, 142, 166, 214] : [100, 128, 156, 214];
+  const xs = [100, 128, 156, 214];
   let s = `
     <line x1="0" y1="40" x2="320" y2="40" stroke="var(--wire)" stroke-width="5"/>
     <rect x="70" y="14" width="180" height="52" rx="22" fill="var(--resistor-body)" stroke="rgba(0,0,0,0.25)"/>`;
@@ -510,66 +496,31 @@ $("e-add-block").addEventListener("click", () => {
 
 // ---------- tab 4: resistor finder ----------
 
-function fillToleranceOptions() {
-  const fiveBand = document.querySelector('input[name="f-bands"]:checked').value === "5";
-  const sel = $("f-tol");
-  const defaultText = fiveBand ? "±1%" : "±5%";
-  sel.innerHTML = TOLERANCES.map((t, i) =>
-    `<option value="${i}"${t.text === defaultText ? " selected" : ""}>${t.text} (${t.band.name})</option>`).join("");
-}
+// One row: value typed -> closest E24 value -> its 4-band colour code.
 
 function updateFinder() {
   const r = parseOhms($("f-value").value);
-  const digits = document.querySelector('input[name="f-bands"]:checked').value === "5" ? 3 : 2;
-  const tol = TOLERANCES[+$("f-tol").value];
-  const err = $("f-error"), results = $("f-results");
+  const ok = r > 0;
+  $("f-value").classList.toggle("invalid", !ok);
 
-  $("f-value").classList.toggle("invalid", !(r > 0));
-  setText("f-parsed", r > 0 ? `= ${fmtOhms(r)}` : "");
-
-  const code = r > 0 ? bandCode(r, digits) : null;
-  if (!code) {
-    err.textContent = r > 0
-      ? `${fmtOhms(r)} is outside what a ${digits + 2}-band colour code can show.`
-      : "Type a resistance, e.g. 220, 4.7k, 4k7 or 1M.";
-    err.hidden = false;
-    results.hidden = true;
+  if (!ok) {
+    setText("f-parsed", "Not understood");
+    setText("f-out-closest", "—");
+    setText("f-bands", "");
+    $("f-svg").innerHTML = "";
     return;
   }
-  err.hidden = true;
-  results.hidden = false;
 
-  const bands = [...code.digitBands, code.mult, tol.band];
+  const closest = closestStandard(r);
+  const exact = Math.abs(closest - r) / r < 1e-6;
+  setText("f-parsed", exact ? `${fmtOhms(r)} · standard value` : `${fmtOhms(r)}`);
+  setText("f-out-closest", fmtOhms(closest));
+  const bands = colourBands(closest);
   drawResistor("f-svg", bands);
-  setText("f-out-value", `${fmtOhms(code.value)} ${tol.text}`);
-
-  const ordinal = ["1st", "2nd", "3rd"];
-  const items = code.digitBands.map((b, k) => ({ band: b, text: `${ordinal[k]} digit: ${code.digitVals[k]}` }));
-  items.push({ band: code.mult, text: `Multiplier: ${MULT_TEXT[code.exp]}` });
-  items.push({ band: tol.band, text: `Tolerance: ${tol.text}` });
-  $("f-band-list").innerHTML = items.map(it => `
-    <li><span class="swatch" style="background:${it.band.hex}"></span>
-      <strong>${it.band.name}</strong> <span class="note">${it.text}</span></li>`).join("");
-
-  const notes = [];
-  if (Math.abs(code.value - r) / r > 1e-6) {
-    notes.push(`${fmtOhms(r)} needs more than ${digits} digits, so it's shown rounded to ${fmtOhms(code.value)}.` +
-               (digits === 2 ? " A 5-band code can show 3 digits." : ""));
-  }
-  // E24 is the usual 4-band (±5%) range; 5-band parts come from finer ranges (E96 etc.).
-  const e24 = closestStandard(r);
-  if (digits === 2 && Math.abs(e24 - r) / r > 1e-6) {
-    notes.push(`${fmtOhms(r)} isn't a standard E24 value; the nearest is ${fmtOhms(e24)}.`);
-  }
-  setText("f-note", notes.join(" "));
+  setText("f-bands", bandNames(bands));
 }
 
-document.querySelectorAll('input[name="f-bands"]').forEach(el => el.addEventListener("change", () => {
-  fillToleranceOptions();
-  updateFinder();
-}));
 $("f-value").addEventListener("input", updateFinder);
-$("f-tol").addEventListener("change", updateFinder);
 
 // ---------- tabs ----------
 
@@ -617,6 +568,5 @@ updateSingle();
 updateMulti();
 renderEquivInputs();
 updateEquiv();
-fillToleranceOptions();
 updateFinder();
 showTab(location.hash.slice(1) || "single");

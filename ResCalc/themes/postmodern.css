@@ -379,7 +379,7 @@ footer {
 .btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--teal); }
 .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--teal); }
 
-.r-input, select {
+.r-input {
   border: 2px solid var(--border);
   border-radius: 3px;
   background: var(--bg);
@@ -387,7 +387,7 @@ footer {
   font-size: 0.95rem;
 }
 
-.r-input:focus, select:focus { outline: none; box-shadow: 3px 3px 0 var(--accent); }
+.r-input:focus { outline: none; box-shadow: 3px 3px 0 var(--accent); }
 .r-input.invalid { border-color: var(--accent); background: var(--error-bg); box-shadow: none; }
 
 code { font-family: var(--font-mono); font-size: 0.85em; }
@@ -401,6 +401,3 @@ code { font-family: var(--font-mono); font-size: 0.85em; }
 .block-head { font-family: var(--font-display); }
 .block-head em { font-family: var(--font-serif); font-size: 1.05em; }
 
-.band-list li strong { font-family: var(--font-display); min-width: 4.5em; }
-.swatch { border: 2px solid var(--border); border-radius: 2px; }
-.finder-value { font-size: 1.8rem; }
