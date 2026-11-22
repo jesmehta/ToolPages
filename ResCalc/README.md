@@ -2,7 +2,8 @@
 
 A simple tool to calculate the resistor required to control voltage and current for LEDs.
 
-Open [index.html](index.html) in a browser. It is plain HTML/CSS/JS with no libraries or build step.
+Live at <https://cabinetofcuriosities.in/resistor-calculator/> (Cabinet of Curiosities, under Machines & Makings).
+Locally, open [index.html](index.html) in a browser. It is plain HTML/CSS/JS with no libraries or build step.
 
 ## Why it exists
 
@@ -213,11 +214,18 @@ A stage-by-stage visual version, with screenshots, is in [CHANGELOG.md](CHANGELO
   `--steps` / `--steps-w` on `.card`).
 - 2026-11-22 — Visual changelog: `CHANGELOG.md` with screenshots of every stage in `dev-screenshots/`.
 - 2026-11-22 — Background symbols straightened: same scattered positions, each horizontal or vertical (no tilt).
+- 2026-11-22 — Published on the Cabinet of Curiosities at `/resistor-calculator/` (Machines & Makings), as a pinned
+  external mount of this folder.
 
 ## To do / watch out for
 
 - The stepped lines sit outside the card on both sides, so they need the side gutters: 37px on desktop, 15px on
   phones. If the page's side padding shrinks, they'll be clipped (checked: no sideways scroll at 320 px).
+- **Cabinet shows a pinned commit.** A push here does not change the live page: in CabinetOfCuriosities run
+  `npm run update-externals`, check the report, and add any new file the page loads to
+  `content/external-allowlists/resistor-calculator.txt` (today: index.html, style.css, theme.css, script.js,
+  bg-symbols.svg). The repo has GitHub Pages on, so a copy also sits at jesmehta.github.io/ToolPages/ResCalc/;
+  the Cabinet URL is the one to share.
 - When a change is visible, add a stage to `CHANGELOG.md` with a screenshot in `dev-screenshots/`.
 - The page title and subtitle still talk only about LEDs, but tabs 3 and 4 are general resistor tools.
 - Possible: E96 suggestions for 5-band; a typed-expression input for the equivalent tab; bridge networks.
