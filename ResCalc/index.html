@@ -318,6 +318,26 @@
         <p class="note">Type values like <code>220</code>, <code>4.7k</code>, <code>4k7</code> or <code>1M</code>.
           4-band, &plusmn;5% (gold). Read from the end where the bands are bunched together.</p>
       </section>
+
+      <section class="card">
+        <h2>Resistor identifier</h2>
+
+        <div class="options">
+          <label><input type="radio" name="id-count" value="4" checked> 4-band</label>
+          <label><input type="radio" name="id-count" value="5"> 5-band</label>
+        </div>
+
+        <!-- one labelled dropdown per band, built by script.js -->
+        <div class="id-bands" id="id-selects"></div>
+
+        <div class="id-result">
+          <svg id="id-svg" viewBox="0 0 320 80" role="img" aria-label="Resistor with the chosen colour bands"></svg>
+          <div>
+            <p class="cg-val accent" id="id-value"></p>
+            <p class="note" id="id-range"></p>
+          </div>
+        </div>
+      </section>
     </div>
 
     <footer>

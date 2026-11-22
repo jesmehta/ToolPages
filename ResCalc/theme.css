@@ -431,3 +431,10 @@ code { font-family: var(--font-mono); font-size: 0.85em; }
 .block-head { font-family: var(--font-display); }
 .block-head em { font-family: var(--font-serif); font-size: 1.05em; }
 
+
+/* ---------- resistor identifier ---------- */
+
+.id-band span { font-family: var(--font-display); font-weight: 600; letter-spacing: 0.02em; }
+.id-band select { border: 2px solid var(--border); border-radius: 3px; font-family: var(--font-body); }
+.id-band select:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+.id-result .cg-val { font-size: 1.7rem; }

@@ -140,9 +140,9 @@ const bandNames = bands => bands.map(b => b.name).join(" – ");
 
 // ---------- drawing: single resistor ----------
 
-// Draws a large 4-band resistor; the tolerance band sits apart.
+// Draws a large 4- or 5-band resistor; the tolerance band sits apart.
 function drawResistor(svgId, bands) {
-  const xs = [100, 128, 156, 214];
+  const xs = bands.length === 5 ? [94, 118, 142, 166, 214] : [100, 128, 156, 214];
   let s = `
     <line x1="0" y1="40" x2="320" y2="40" stroke="var(--wire)" stroke-width="5"/>
     <rect x="70" y="14" width="180" height="52" rx="22" fill="var(--resistor-body)" stroke="rgba(0,0,0,0.25)"/>`;
@@ -522,6 +522,87 @@ function updateFinder() {
 
 $("f-value").addEventListener("input", updateFinder);
 
+// ---------- tab 4: resistor identifier (colours -> value) ----------
+
+const MULT_LABEL = { "-2": "0.01", "-1": "0.1", 0: "1", 1: "10", 2: "100", 3: "1k", 4: "10k",
+                     5: "100k", 6: "1M", 7: "10M", 8: "100M", 9: "1G" };
+
+// Options for each kind of band: { band, value, label }
+const ID_OPTIONS = {
+  digit: COLOURS.map((c, i) => ({ band: c, value: i, label: `${c.name} · ${i}` })),
+  mult: [
+    ...COLOURS.map((c, i) => ({ band: c, value: i, label: `${c.name} · ×${MULT_LABEL[i]}` })),
+    { band: GOLD, value: -1, label: "Gold · ×0.1" },
+    { band: SILVER, value: -2, label: "Silver · ×0.01" },
+  ],
+  tol: [
+    { band: COLOURS[1], value: 1,    label: "Brown · ±1%" },
+    { band: COLOURS[2], value: 2,    label: "Red · ±2%" },
+    { band: COLOURS[5], value: 0.5,  label: "Green · ±0.5%" },
+    { band: COLOURS[6], value: 0.25, label: "Blue · ±0.25%" },
+    { band: COLOURS[7], value: 0.1,  label: "Violet · ±0.1%" },
+    { band: COLOURS[8], value: 0.05, label: "Grey · ±0.05%" },
+    { band: GOLD,       value: 5,    label: "Gold · ±5%" },
+    { band: SILVER,     value: 10,   label: "Silver · ±10%" },
+  ],
+};
+
+// Band roles and default picks (by option label) for each band count.
+const ID_LAYOUTS = {
+  4: { roles: ["digit", "digit", "mult", "tol"],
+       titles: ["Band 1 · digit", "Band 2 · digit", "Band 3 · multiplier", "Band 4 · tolerance"],
+       defaults: ["Yellow · 4", "Violet · 7", "Red · ×100", "Gold · ±5%"] },
+  5: { roles: ["digit", "digit", "digit", "mult", "tol"],
+       titles: ["Band 1 · digit", "Band 2 · digit", "Band 3 · digit", "Band 4 · multiplier", "Band 5 · tolerance"],
+       defaults: ["Yellow · 4", "Violet · 7", "Black · 0", "Brown · ×10", "Brown · ±1%"] },
+};
+
+// Dark text on light bands, white text on dark ones.
+function textOn(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  const lum = 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255);
+  return lum > 140 ? "#1b1a2e" : "#ffffff";
+}
+
+function buildIdentifier() {
+  const count = document.querySelector('input[name="id-count"]:checked').value;
+  const layout = ID_LAYOUTS[count];
+  $("id-selects").innerHTML = layout.roles.map((role, k) => `
+    <label class="id-band">
+      <span>${layout.titles[k]}</span>
+      <select data-role="${role}">
+        ${ID_OPTIONS[role].map((o, i) =>
+          `<option value="${i}"${o.label === layout.defaults[k] ? " selected" : ""}>${o.label}</option>`).join("")}
+      </select>
+    </label>`).join("");
+  updateIdentifier();
+}
+
+function updateIdentifier() {
+  const picks = [...document.querySelectorAll("#id-selects select")].map(sel => {
+    const opt = ID_OPTIONS[sel.dataset.role][+sel.value];
+    sel.style.background = opt.band.hex;      // the dropdown takes its band's colour
+    sel.style.color = textOn(opt.band.hex);
+    return { role: sel.dataset.role, ...opt };
+  });
+
+  const digits = picks.filter(p => p.role === "digit").map(p => p.value);
+  const exp = picks.find(p => p.role === "mult").value;
+  const tol = picks.find(p => p.role === "tol").value;
+  const n = parseInt(digits.join(""), 10);
+  const r = +(n * Math.pow(10, exp)).toPrecision(6);
+
+  drawResistor("id-svg", picks.map(p => p.band));
+  setText("id-value", `${fmtOhms(r)} ±${tol}%`);
+  setText("id-range", r > 0
+    ? `Anywhere from ${fmtOhms(r * (1 - tol / 100))} to ${fmtOhms(r * (1 + tol / 100))}.` +
+      (digits.length === 2 && Math.abs(closestStandard(r) - r) / r < 1e-6 ? " A standard E24 value." : "")
+    : "All digit bands black gives 0 Ω (a zero-ohm link is usually a single black band).");
+}
+
+document.querySelectorAll('input[name="id-count"]').forEach(el => el.addEventListener("change", buildIdentifier));
+$("id-selects").addEventListener("change", updateIdentifier);
+
 // ---------- tabs ----------
 
 const TABS = ["single", "multi", "equiv", "finder"];
@@ -548,4 +629,5 @@ updateMulti();
 renderEquivInputs();
 updateEquiv();
 updateFinder();
+buildIdentifier();
 showTab(location.hash.slice(1) || "single");

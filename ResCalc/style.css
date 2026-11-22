@@ -311,3 +311,40 @@ code { font-size: 0.9em; }
 .choice-grid.finder { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.3fr); }
 .finder-input .r-input { width: 100%; max-width: 160px; text-align: center; font-size: 1.1rem; }
 .finder-input .note { margin: 4px 0 0; font-size: 0.82rem; }
+
+/* ---------- tab 4: resistor identifier ---------- */
+
+.id-bands {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin: 14px 0 6px;
+}
+
+.id-band { display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; color: var(--muted); }
+
+.id-band select {
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* the closed dropdown takes its band colour (set in script.js); keep the open list readable */
+.id-band option { background: var(--card); color: var(--text); }
+
+.id-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 24px;
+  margin-top: 10px;
+}
+
+.id-result svg { width: 100%; max-width: 320px; height: auto; }
+.id-result .cg-val { margin: 0; }
+.id-result .note { margin: 2px 0 0; }
