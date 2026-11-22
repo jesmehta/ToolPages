@@ -148,7 +148,7 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
 - 2026-11-22 — Resistor finder simplified to one row: resistor needed | closest standard (E24) | colour bands.
   Removed band-count and tolerance options and the band key.
 - 2026-11-22 — Look finalised. Solid drop shadows replaced by stepped left-edge lines (5→1px, 6px gaps; 3→1px on
-  phones); tabs are touching rounded rectangles (not pills), no rule under them. Theme trial closed: postmodern kept as `theme.css`, the notebook /
+  phones); tabs are rounded rectangles with a 6px gap (not pills), no rule under them. Theme trial closed: postmodern kept as `theme.css`, the notebook /
   datasheet / memphis themes and the picker removed (they're in git history, commits 7928cd7, f00a7fe, 262ddeb).
 
 ## To do / watch out for

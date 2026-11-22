@@ -177,13 +177,11 @@ h3 { margin: 26px 0 10px; font-size: 1.05rem; font-weight: 600; }
 
 /* ---------- tabs ---------- */
 
-/* Rounded rectangles touching each other: no gap, and a -2px margin so
-   neighbours share one border instead of doubling it (also when wrapped). */
+/* Rounded rectangles with a small gap between them. */
 .tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 0;
-  padding: 0 2px 2px 0;
+  gap: 6px;
   margin-bottom: 20px;
   border-bottom: none;   /* no rule under the tabs */
 }
@@ -193,7 +191,6 @@ h3 { margin: 26px 0 10px; font-size: 1.05rem; font-weight: 600; }
   font-size: 1rem;
   font-weight: 600;
   padding: 7px 18px;
-  margin: 0 -2px -2px 0;
   border: 2px solid var(--border);
   border-radius: 6px;
   background: var(--card);
