@@ -128,3 +128,10 @@ Stepped lines mirrored on the right of each card.
 | LED tabs | Equivalent resistance |
 | --- | --- |
 | ![Current, single LED](dev-screenshots/16a-current-single.jpg) | ![Current, equivalent](dev-screenshots/16b-current-equivalent.jpg) |
+
+## 17. Straight background symbols — 2026-11-22
+
+The background symbols keep their scattered positions but are no longer randomly tilted: each
+one is now horizontal or vertical, which gives a calmer, schematic-sheet feel.
+
+![Straight background symbols](dev-screenshots/17-straight-symbols.jpg)

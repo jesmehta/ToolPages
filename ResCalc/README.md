@@ -163,7 +163,8 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
   `#B392F0`), light outlines, stepped accent lines on both sides of each card, the centred title, and the
   animated title circuit's styles.
   The colour variables keep their original role names (`--accent`, `--teal`, `--mustard`, `--violet`).
-- `bg-symbols.svg` — faint (18% opacity) Memphis-style background tile of electrical symbols in the same four colours
+- `bg-symbols.svg` — faint (18% opacity) Memphis-style background tile of electrical symbols in the same four
+  colours, scattered but each one horizontal or vertical
 - `script.js` — LED calculation (shared by tabs 1–2), equivalent-resistance network, resistor finder, value parsing,
   E24 lookup, colour-band encoding, resistor / circuit / network SVG drawing, tabs, title circuit
 - `CHANGELOG.md` — visual changelog: each development stage with a screenshot
@@ -211,6 +212,7 @@ A stage-by-stage visual version, with screenshots, is in [CHANGELOG.md](CHANGELO
   Stepped card lines mirrored on the right as well (full strength on both sides; the pattern is shared via
   `--steps` / `--steps-w` on `.card`).
 - 2026-11-22 — Visual changelog: `CHANGELOG.md` with screenshots of every stage in `dev-screenshots/`.
+- 2026-11-22 — Background symbols straightened: same scattered positions, each horizontal or vertical (no tilt).
 
 ## To do / watch out for
 
