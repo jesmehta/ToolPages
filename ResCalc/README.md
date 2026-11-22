@@ -146,7 +146,9 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
   white, midnight blue, midnight green) and ~15 colour sets. The page is always dark now; it no longer follows the
   system light/dark setting.
 - **Animated circuit round the title**: the header's border is a working circuit (battery left, switch top,
-  resistor right, LED bottom). The switch opens and closes every 4 s and the LED lights only while it's closed.
+  resistor right, three LEDs in series along the bottom at 1/6, 1/2 and 5/6 of its length). The LEDs point right,
+  so the battery's + plate faces down and current runs counter-clockwise. The switch opens and closes every 4 s
+  and the LEDs light only while it's closed.
   The shape is drawn to the header's size by `drawHeroCircuit()` (redrawn on resize); the motion is CSS keyframes
   with shared timing. With reduced motion turned on, it holds still with the switch closed and the LED lit.
 - **No libraries**: unlike the other ToolPages tools, this needs no canvas drawing, so p5.js isn't used. The resistor
@@ -197,6 +199,8 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
 - 2026-11-22 — Palette trial (temporary panel) → midnight blue with the Neon set; title squiggle follows the accent
   colour; background symbols recoloured and faded to 18%. Circle-and-triangle beside the title replaced by an
   animated battery / switch / resistor / LED circuit running round the title as its border.
+- 2026-11-22 — Title circuit: three LEDs in series pointing right, evenly over the middle two-thirds of the
+  bottom edge; battery flipped to match; + label moved outside the border.
 
 ## To do / watch out for
 

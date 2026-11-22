@@ -783,9 +783,10 @@ TABS.forEach(t => $(`tab-${t}`).addEventListener("click", () => showTab(t)));
 
 // ---------- header: animated circuit round the title ----------
 //
-// The wire is a rounded rectangle round the header. Current runs clockwise
-// from the battery's + plate: battery (left edge) -> switch (top) ->
-// resistor (right) -> LED (bottom) -> back to the battery.
+// The wire is a rounded rectangle round the header. Current runs
+// counter-clockwise from the battery's + plate (facing down): battery (left
+// edge) -> three LEDs in series (bottom, pointing right) -> resistor (right)
+// -> switch (top) -> back to the battery.
 // Drawn to the header's size and redrawn when it changes. The switch / LED
 // animation itself is CSS (theme.css, .hero-circuit).
 
@@ -796,17 +797,33 @@ function drawHeroCircuit() {
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
 
   const x0 = 6, y0 = 6, x1 = W - 6, y1 = H - 6, r = 12;
+  const L = x1 - x0;
   const yb = (y0 + y1) / 2;                       // battery, left edge
-  const xs = x0 + (x1 - x0) * 0.66, xc = xs + 34; // switch pivot and contact, top edge
+  const xs = x0 + L * 0.66, xc = xs + 34;         // switch pivot and contact, top edge
   const yr = (y0 + y1) / 2;                       // resistor, right edge
-  const xl = x0 + (x1 - x0) * 0.4;                // LED, bottom edge
+  // three LEDs spread evenly over the middle two-thirds of the bottom edge
+  const leds = [1 / 6, 1 / 2, 5 / 6].map(f => x0 + L * f);
+  const LH = 9;                                   // half an LED's width
+
+  // bottom edge: corner -> gaps round each LED -> corner
+  const bottom = [x0 + r, ...leds.flatMap(c => [c - LH, c + LH]), x1 - r];
+  const bottomWires = [];
+  for (let i = 0; i < bottom.length; i += 2) bottomWires.push(`M${bottom[i]} ${y1} H${bottom[i + 1]}`);
 
   const wires = [
     `M${x0} ${yb - 6} V${y0 + r} A${r} ${r} 0 0 1 ${x0 + r} ${y0} H${xs}`,
     `M${xc} ${y0} H${x1 - r} A${r} ${r} 0 0 1 ${x1} ${y0 + r} V${yr - 17}`,
-    `M${x1} ${yr + 17} V${y1 - r} A${r} ${r} 0 0 1 ${x1 - r} ${y1} H${xl + 9}`,
-    `M${xl - 9} ${y1} H${x0 + r} A${r} ${r} 0 0 1 ${x0} ${y1 - r} V${yb + 6}`,
+    `M${x1} ${yr + 17} V${y1 - r} A${r} ${r} 0 0 1 ${x1 - r} ${y1}`,
+    `M${x0 + r} ${y1} A${r} ${r} 0 0 1 ${x0} ${y1 - r} V${yb + 6}`,
+    ...bottomWires,
   ];
+
+  // LED pointing right: anode (flat side) left, cathode bar right
+  const led = c => `
+    <circle class="hc-glow" cx="${c}" cy="${y1}" r="12"/>
+    <polygon class="hc-led" points="${c - LH},${y1 - 9} ${c - LH},${y1 + 9} ${c + LH},${y1}"/>
+    <line class="hc-bar" x1="${c + LH}" y1="${y1 - 9}" x2="${c + LH}" y2="${y1 + 9}"/>
+    <path class="hc-rays" d="M${c - 4} ${y1 + 12} l6 7 m-4 0 h4 v-4 M${c + 3} ${y1 + 12} l6 7 m-4 0 h4 v-4"/>`;
 
   // resistor body (vertical) with 220 Ω bands: red red brown gold
   const bands = ["#d32f2f", "#d32f2f", "#7b3f00", "#c9a227"];
@@ -815,10 +832,10 @@ function drawHeroCircuit() {
   svg.innerHTML = `
     ${wires.map(d => `<path class="hc-wire" d="${d}"/>`).join("")}
 
-    <!-- battery: long (+) plate on top, short plate below -->
-    <line class="hc-wire" x1="${x0 - 11}" y1="${yb - 6}" x2="${x0 + 11}" y2="${yb - 6}"/>
-    <line class="hc-wire" x1="${x0 - 6}" y1="${yb + 6}" x2="${x0 + 6}" y2="${yb + 6}" style="stroke-width:4"/>
-    <text class="hc-label" x="${x0 + 15}" y="${yb - 9}">+</text>
+    <!-- battery: long (+) plate below, facing the LEDs; short plate above -->
+    <line class="hc-wire" x1="${x0 - 6}" y1="${yb - 6}" x2="${x0 + 6}" y2="${yb - 6}" style="stroke-width:4"/>
+    <line class="hc-wire" x1="${x0 - 11}" y1="${yb + 6}" x2="${x0 + 11}" y2="${yb + 6}"/>
+    <text class="hc-label" x="${x0 - 13}" y="${yb + 16}" text-anchor="end">+</text>
 
     <!-- switch: lever pivots at (xs, y0) and swings down onto the contact -->
     <circle class="hc-node" cx="${xs}" cy="${y0}" r="3"/>
@@ -829,11 +846,8 @@ function drawHeroCircuit() {
     <rect class="hc-resistor" x="${x1 - 7}" y="${yr - 17}" width="14" height="34" rx="5"/>
     ${bands.map((c, i) => `<rect x="${x1 - 7}" y="${bandYs[i]}" width="14" height="3" fill="${c}"/>`).join("")}
 
-    <!-- LED pointing left (current flows right to left along the bottom) -->
-    <circle class="hc-glow" cx="${xl}" cy="${y1}" r="12"/>
-    <polygon class="hc-led" points="${xl + 9},${y1 - 9} ${xl + 9},${y1 + 9} ${xl - 9},${y1}"/>
-    <line class="hc-bar" x1="${xl - 9}" y1="${y1 - 9}" x2="${xl - 9}" y2="${y1 + 9}"/>
-    <path class="hc-rays" d="M${xl - 4} ${y1 + 12} l6 7 m-4 0 h4 v-4 M${xl + 3} ${y1 + 12} l6 7 m-4 0 h4 v-4"/>
+    <!-- three LEDs in series, pointing right (current flows left to right along the bottom) -->
+    ${leds.map(led).join("")}
   `;
 }
 
