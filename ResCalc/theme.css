@@ -162,6 +162,10 @@ header h1, header .subtitle { text-align: center; text-wrap: balance; }
 
 /* ---------- cards ---------- */
 
+/* Stepped lines down the outside of each card, thinning to nothing: reading
+   outward from the card, a 6px gap then lines of 5, 4, 3, 2 and 1px, each
+   separated by 4px (37px in all). Full strength on the left, mirrored on the
+   right at half strength. The pattern lives in --steps so both sides share it. */
 .card {
   position: relative;
   background: var(--card);
@@ -169,27 +173,28 @@ header h1, header .subtitle { text-align: center; text-wrap: balance; }
   border-radius: 4px;
   padding: 20px 22px;
   margin-bottom: 22px;
-}
-
-/* Stepped lines down the outside of the left edge, thinning to nothing:
-   reading outward from the card, a 6px gap then lines of 5, 4, 3, 2 and 1px,
-   each separated by 4px (37px in all). */
-.card::before {
-  content: "";
-  position: absolute;
-  top: -2px;
-  bottom: -2px;
-  right: calc(100% + 2px);
-  width: 37px;
   --c: var(--card-accent, var(--accent));
-  background: linear-gradient(to left,
+  --steps-w: 37px;
+  --steps:
     transparent 0 6px,     var(--c) 6px 11px,
     transparent 11px 15px, var(--c) 15px 19px,
     transparent 19px 23px, var(--c) 23px 26px,
     transparent 26px 30px, var(--c) 30px 32px,
-    transparent 32px 36px, var(--c) 36px 37px);
+    transparent 32px 36px, var(--c) 36px 37px;
+}
+
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: var(--steps-w);
   pointer-events: none;
 }
+
+.card::before { right: calc(100% + 2px); background: linear-gradient(to left, var(--steps)); }
+.card::after  { left: calc(100% + 2px);  background: linear-gradient(to right, var(--steps)); opacity: 0.5; }
 
 /* Each panel's cards: inputs = teal, circuit = mustard, results = tomato */
 [role="tabpanel"] .card:nth-of-type(1) { --card-accent: var(--teal); }
@@ -399,14 +404,14 @@ footer {
 @media (max-width: 520px) {
   header { padding: 22px 18px 26px 26px; }
   table.calc .value { white-space: normal; }
-  .card { padding: 16px 14px; }
-  /* The 16px phone gutter can't hold 45px of lines, so use 3, 2, 1px lines with 3px gaps (15px). */
-  .card::before {
-    width: 15px;
-    background: linear-gradient(to left,
-      transparent 0 3px,   var(--c) 3px 6px,
-      transparent 6px 9px, var(--c) 9px 11px,
-      transparent 11px 14px, var(--c) 14px 15px);
+  /* The 16px phone gutter can't hold 37px of lines, so use 3, 2, 1px lines with 3px gaps (15px). */
+  .card {
+    padding: 16px 14px;
+    --steps-w: 15px;
+    --steps:
+      transparent 0 3px,     var(--c) 3px 6px,
+      transparent 6px 9px,   var(--c) 9px 11px,
+      transparent 11px 14px, var(--c) 14px 15px;
   }
   table.calc .formula { display: none; }
   .choice-grid { gap: 6px 8px; }
