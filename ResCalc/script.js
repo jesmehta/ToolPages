@@ -781,91 +781,64 @@ function showTab(name) {
 
 TABS.forEach(t => $(`tab-${t}`).addEventListener("click", () => showTab(t)));
 
-// ---------- palette trial (temporary) ----------
+// ---------- header: animated circuit round the title ----------
 //
-// Two dropdowns: a background (the page's surface colours) and a colour set
-// (the theme's four colours: accent, second, third, and fourth = the "violet"
-// slot for the selected tab and toggles). Sets made for light backgrounds are
-// lightened a little on midnight blue; the midnight sets are used as they are.
-// Remove once a background and palette are chosen.
+// The wire is a rounded rectangle round the header. Current runs clockwise
+// from the battery's + plate: battery (left edge) -> switch (top) ->
+// resistor (right) -> LED (bottom) -> back to the battery.
+// Drawn to the header's size and redrawn when it changes. The switch / LED
+// animation itself is CSS (theme.css, .hero-circuit).
 
-const PAL_BACKGROUNDS = {
-  "Warm paper": { dark: false, vars: {
-    "--bg": "#f3ede2", "--card": "#fffaf1", "--text": "#1b1a2e", "--muted": "#5d5a70", "--border": "#1b1a2e",
-    "--rule": "#d8cfc0", "--error-bg": "#ffe1d6", "--error-text": "#8c2a10", "--resistor-body": "#e9d3a3", "--wire": "#3d3b52" } },
-  "Cool white": { dark: false, vars: {
-    "--bg": "#f3f5f9", "--card": "#ffffff", "--text": "#18203a", "--muted": "#58627a", "--border": "#18203a",
-    "--rule": "#d6dce7", "--error-bg": "#fde4e4", "--error-text": "#8a1c1c", "--resistor-body": "#e9d3a3", "--wire": "#38415a" } },
-  "Midnight blue": { dark: true, vars: {
-    "--bg": "#0d1830", "--card": "#14223f", "--text": "#e8eefa", "--muted": "#9eb0cf", "--border": "#d7e2f5",
-    "--rule": "#2a3c60", "--error-bg": "#4a1f2a", "--error-text": "#ffb4bd", "--resistor-body": "#d1bb8c", "--wire": "#b6c5de" } },
-  "Midnight green": { dark: true, vars: {
-    "--bg": "#0b1f1a", "--card": "#122a24", "--text": "#e8f3ee", "--muted": "#9dbdb1", "--border": "#d4e9e0",
-    "--rule": "#25443a", "--error-bg": "#4a1f22", "--error-text": "#ffb4b4", "--resistor-body": "#d1bb8c", "--wire": "#b1cfc2" } },
-};
+function drawHeroCircuit() {
+  const header = $("hero"), svg = $("hero-circuit");
+  const W = header.clientWidth, H = header.clientHeight;
+  if (!W || !H) return;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
 
-// [accent, second, third, fourth]; `forDark` sets are designed for midnight blue.
-const PAL_SETS = {
-  "Current (tomato · teal · mustard · violet)": { c: ["#E4572E", "#1F8A85", "#F2B134", "#6C4AB6"] },
-  "1. Resistor code":           { c: ["#E8731A", "#2F8F46", "#E9B91F", "#2A62C9"] },
-  "2. Bauhaus":                 { c: ["#D62828", "#1D4E89", "#F2B705", "#2B2D42"] },
-  "3. Risograph":               { c: ["#F2539B", "#00838A", "#F7D417", "#3255A4"] },
-  "4. Circuit board":           { c: ["#C8743A", "#1E6B3A", "#D9A93B", "#22356B"] },
-  "5. Resistor code + violet":  { c: ["#E8731A", "#2F8F46", "#E9B91F", "#6C4AB6"] },
-  "6. Bauhaus + violet":        { c: ["#D62828", "#1D4E89", "#F2B705", "#6C4AB6"] },
-  "7. Risograph + violet":      { c: ["#F2539B", "#00838A", "#F7D417", "#6C4AB6"] },
-  "8. Circuit board + violet":  { c: ["#C8743A", "#1E6B3A", "#D9A93B", "#6C4AB6"] },
-  "M1. Neon (coral · cyan · amber · lavender)":  { forDark: true, c: ["#FF6B6B", "#4CC9F0", "#FFC857", "#B392F0"] },
-  "M2. Aurora (mint · sky · lemon · orchid)":    { forDark: true, c: ["#4FE0A0", "#6FA8FF", "#F2E86D", "#D17BE8"] },
-  "M3. Ember (orange · aqua · gold · violet)":   { forDark: true, c: ["#FF8F4D", "#3DD6C6", "#F2C94C", "#9D7BFF"] },
-  "G1. Lantern (apricot · sky · lemon · lavender)": { forDark: true, green: true, c: ["#FF9E5E", "#7FC8F8", "#F4E285", "#B8A1F2"] },
-  "G2. Reef (coral · turquoise · gold · orchid)":   { forDark: true, green: true, c: ["#FF6F61", "#4FD8C8", "#F6C744", "#E58BD8"] },
-  "G3. Copper (copper · mint · cream · violet)":    { forDark: true, green: true, c: ["#E8895A", "#7BE0AD", "#F1E3B5", "#A88BFA"] },
-};
+  const x0 = 6, y0 = 6, x1 = W - 6, y1 = H - 6, r = 12;
+  const yb = (y0 + y1) / 2;                       // battery, left edge
+  const xs = x0 + (x1 - x0) * 0.66, xc = xs + 34; // switch pivot and contact, top edge
+  const yr = (y0 + y1) / 2;                       // resistor, right edge
+  const xl = x0 + (x1 - x0) * 0.4;                // LED, bottom edge
 
-const PAL_VARS = ["--accent", "--teal", "--mustard", "--violet"];
+  const wires = [
+    `M${x0} ${yb - 6} V${y0 + r} A${r} ${r} 0 0 1 ${x0 + r} ${y0} H${xs}`,
+    `M${xc} ${y0} H${x1 - r} A${r} ${r} 0 0 1 ${x1} ${y0 + r} V${yr - 17}`,
+    `M${x1} ${yr + 17} V${y1 - r} A${r} ${r} 0 0 1 ${x1 - r} ${y1} H${xl + 9}`,
+    `M${xl - 9} ${y1} H${x0 + r} A${r} ${r} 0 0 1 ${x0} ${y1 - r} V${yb + 6}`,
+  ];
 
-function lighten(hex, amount) {
-  const n = parseInt(hex.slice(1), 16);
-  const mix = c => Math.round(c + (255 - c) * amount).toString(16).padStart(2, "0");
-  return `#${mix(n >> 16)}${mix((n >> 8) & 255)}${mix(n & 255)}`;
+  // resistor body (vertical) with 220 Ω bands: red red brown gold
+  const bands = ["#d32f2f", "#d32f2f", "#7b3f00", "#c9a227"];
+  const bandYs = [yr - 11, yr - 6, yr - 1, yr + 8];
+
+  svg.innerHTML = `
+    ${wires.map(d => `<path class="hc-wire" d="${d}"/>`).join("")}
+
+    <!-- battery: long (+) plate on top, short plate below -->
+    <line class="hc-wire" x1="${x0 - 11}" y1="${yb - 6}" x2="${x0 + 11}" y2="${yb - 6}"/>
+    <line class="hc-wire" x1="${x0 - 6}" y1="${yb + 6}" x2="${x0 + 6}" y2="${yb + 6}" style="stroke-width:4"/>
+    <text class="hc-label" x="${x0 + 15}" y="${yb - 9}">+</text>
+
+    <!-- switch: lever pivots at (xs, y0) and swings down onto the contact -->
+    <circle class="hc-node" cx="${xs}" cy="${y0}" r="3"/>
+    <circle class="hc-node" cx="${xc}" cy="${y0}" r="3"/>
+    <line class="hc-wire hc-lever" x1="${xs}" y1="${y0}" x2="${xc}" y2="${y0}" style="transform-origin:${xs}px ${y0}px"/>
+
+    <!-- resistor -->
+    <rect class="hc-resistor" x="${x1 - 7}" y="${yr - 17}" width="14" height="34" rx="5"/>
+    ${bands.map((c, i) => `<rect x="${x1 - 7}" y="${bandYs[i]}" width="14" height="3" fill="${c}"/>`).join("")}
+
+    <!-- LED pointing left (current flows right to left along the bottom) -->
+    <circle class="hc-glow" cx="${xl}" cy="${y1}" r="12"/>
+    <polygon class="hc-led" points="${xl + 9},${y1 - 9} ${xl + 9},${y1 + 9} ${xl - 9},${y1}"/>
+    <line class="hc-bar" x1="${xl - 9}" y1="${y1 - 9}" x2="${xl - 9}" y2="${y1 + 9}"/>
+    <path class="hc-rays" d="M${xl - 4} ${y1 + 12} l6 7 m-4 0 h4 v-4 M${xl + 3} ${y1 + 12} l6 7 m-4 0 h4 v-4"/>
+  `;
 }
 
-function applyPalette() {
-  let bgName = $("pal-bg").value, setName = $("pal-set").value;
-  if (!PAL_BACKGROUNDS[bgName]) bgName = "Warm paper";
-  if (!PAL_SETS[setName]) setName = Object.keys(PAL_SETS)[0];
-  const bg = PAL_BACKGROUNDS[bgName], set = PAL_SETS[setName];
-  const root = document.documentElement.style;
-
-  Object.entries(bg.vars).forEach(([k, v]) => root.setProperty(k, v));
-  root.colorScheme = bg.dark ? "dark" : "light";
-
-  const colours = set.c.map(hex => (bg.dark && !set.forDark ? lighten(hex, 0.25) : hex));
-  colours.forEach((hex, k) => root.setProperty(PAL_VARS[k], hex));
-  root.setProperty("--on-violet", textOn(colours[3]));
-
-  $("pal-hex").textContent = colours.join(" · ");
-  try { localStorage.setItem("rescalc-palette-trial", JSON.stringify({ bg: bgName, set: setName })); } catch (e) { /* storage blocked */ }
-}
-
-$("pal-bg").innerHTML = Object.keys(PAL_BACKGROUNDS).map(n => `<option>${n}</option>`).join("");
-const setOption = n => `<option>${n}</option>`;
-const setNames = Object.keys(PAL_SETS);
-$("pal-set").innerHTML =
-  `<optgroup label="For light backgrounds">${setNames.filter(n => !PAL_SETS[n].forDark).map(setOption).join("")}</optgroup>` +
-  `<optgroup label="For midnight blue">${setNames.filter(n => PAL_SETS[n].forDark && !PAL_SETS[n].green).map(setOption).join("")}</optgroup>` +
-  `<optgroup label="For midnight green">${setNames.filter(n => PAL_SETS[n].green).map(setOption).join("")}</optgroup>`;
-$("pal-bg").addEventListener("change", applyPalette);
-$("pal-set").addEventListener("change", applyPalette);
-{
-  let saved = null;
-  try { saved = JSON.parse(localStorage.getItem("rescalc-palette-trial")); } catch (e) { /* storage blocked */ }
-  const osDark = matchMedia("(prefers-color-scheme: dark)").matches;
-  $("pal-bg").value = saved?.bg || (osDark ? "Midnight blue" : "Warm paper");
-  $("pal-set").value = saved?.set || setNames[0];
-  applyPalette();
-}
+new ResizeObserver(drawHeroCircuit).observe($("hero"));
+drawHeroCircuit();
 
 // ---------- wiring ----------
 

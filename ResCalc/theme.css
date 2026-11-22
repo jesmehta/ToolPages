@@ -1,51 +1,32 @@
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@1&display=swap");
 
-/* Postmodern-but-serious: ink outlines, stepped accent lines on the left of each card, warm paper,
-   a small set of bold accent colours, and a few geometric flourishes. */
+/* Postmodern-but-serious on midnight blue: light outlines, stepped accent lines on the
+   left of each card, four neon accents (M1: coral, cyan, amber, lavender), and an
+   animated circuit beside the title. Chosen 2026-11-22 from a background/palette trial. */
 
 :root {
-  --bg: #f3ede2;          /* warm paper */
-  --card: #fffaf1;
-  --text: #1b1a2e;        /* ink */
-  --muted: #5d5a70;
-  --border: #1b1a2e;      /* outlines are ink */
-  --rule: #d8cfc0;        /* light dividers inside cards */
-  --accent: #e4572e;      /* tomato */
-  --teal: #1f8a85;
-  --mustard: #f2b134;
-  --violet: #6c4ab6;
-  --on-violet: #ffffff;
-  --error-bg: #ffe1d6;
-  --error-text: #8c2a10;
-  --resistor-body: #e9d3a3;
-  --wire: #3d3b52;
+  color-scheme: dark;
+  --bg: #0d1830;          /* midnight blue */
+  --card: #14223f;
+  --text: #e8eefa;
+  --muted: #9eb0cf;
+  --border: #d7e2f5;      /* outlines */
+  --rule: #2a3c60;        /* dividers inside cards */
+  --accent: #ff6b6b;      /* coral */
+  --teal: #4cc9f0;        /* cyan (variable keeps its old role name) */
+  --mustard: #ffc857;     /* amber */
+  --violet: #b392f0;      /* lavender */
+  --on-violet: #1b1a2e;
+  --error-bg: #4a1f2a;
+  --error-text: #ffb4bd;
+  --resistor-body: #d1bb8c;
+  --wire: #b6c5de;
   --led: #ffe066;
 
   --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --font-body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
   --font-serif: "Instrument Serif", Georgia, serif;
   --font-mono: "IBM Plex Mono", Consolas, monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #15142a;
-    --card: #1f1d38;
-    --text: #f3ede2;
-    --muted: #b3aec8;
-    --border: #f3ede2;
-    --rule: #3a3760;
-    --accent: #ff7a50;
-    --teal: #3cc1b9;
-    --mustard: #f5c451;
-    --violet: #a68af0;
-    --on-violet: #15142a;
-    --error-bg: #4a1f17;
-    --error-text: #ffb59e;
-    --resistor-body: #cdb688;
-    --wire: #b3aec8;
-    --led: #ffe066;
-  }
 }
 
 * { box-sizing: border-box; }
@@ -71,29 +52,62 @@ main {
 
 header {
   position: relative;
-  padding-right: 110px;
-  margin-bottom: 22px;
+  padding: 26px 30px 30px 34px;     /* room inside the circuit border */
+  margin-bottom: 26px;
 }
 
-/* geometric flourishes: a mustard sun and a teal triangle */
-header::before,
-header::after {
-  content: "";
+/* ---------- animated circuit round the title ----------
+   The wire runs as a rounded rectangle round the header with a battery on the
+   left edge, a switch on the top, a resistor on the right and an LED on the
+   bottom (drawn to size by drawHeroCircuit() in script.js). The switch opens
+   and closes on a 4s cycle; the LED lights, with a glow, only while it's closed.
+   The animations share the same timing so they stay in step. */
+
+.hero-circuit {
   position: absolute;
-  border: 2px solid var(--border);
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
 }
-header::before {
-  width: 62px; height: 62px;
-  right: 34px; top: 0;
-  border-radius: 50%;
-  background: var(--mustard);
+
+.hero-circuit .hc-wire { fill: none; stroke: var(--wire); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.hero-circuit .hc-node { fill: var(--wire); }
+.hero-circuit .hc-label { fill: var(--muted); font: 600 10px var(--font-mono); }
+.hero-circuit .hc-resistor { fill: var(--resistor-body); stroke: rgba(0, 0, 0, 0.3); }
+.hero-circuit .hc-led { fill: var(--card); stroke: var(--text); stroke-width: 1.5; animation: hc-led 4s infinite; }
+.hero-circuit .hc-bar { stroke: var(--text); stroke-width: 2; }
+.hero-circuit .hc-glow { fill: var(--mustard); filter: blur(7px); opacity: 0; animation: hc-glow 4s infinite; }
+.hero-circuit .hc-rays { fill: none; stroke: var(--mustard); stroke-width: 1.5; opacity: 0; animation: hc-glow 4s infinite; }
+.hero-circuit .hc-lever {
+  transform-box: view-box;               /* transform-origin (the pivot) is set by script.js */
+  animation: hc-switch 4s infinite;
 }
-header::after {
-  width: 46px; height: 46px;
-  right: 0; top: 30px;
-  background: var(--teal);
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
-  border: none;
+
+/* open 0-40%, swings shut by 50%, closed to 90%, swings open by 100% */
+@keyframes hc-switch {
+  0%, 40%  { transform: rotate(-32deg); }
+  50%, 90% { transform: rotate(0deg); }
+  100%     { transform: rotate(-32deg); }
+}
+
+@keyframes hc-led {
+  0%, 49%  { fill: var(--card); }
+  52%, 90% { fill: var(--mustard); }
+  93%, 100% { fill: var(--card); }
+}
+
+@keyframes hc-glow {
+  0%, 49%  { opacity: 0; }
+  52%, 90% { opacity: 0.85; }
+  93%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-circuit .hc-lever { animation: none; transform: none; }
+  .hero-circuit .hc-led { animation: none; fill: var(--mustard); }
+  .hero-circuit .hc-glow, .hero-circuit .hc-rays { animation: none; opacity: 0.85; }
 }
 
 h1, h2, h3, legend, .tabs button, .cg-head {
@@ -379,10 +393,8 @@ footer {
 }
 
 @media (max-width: 520px) {
-  header { padding-right: 84px; }
+  header { padding: 22px 18px 26px 26px; }
   table.calc .value { white-space: normal; }
-  header::before { width: 40px; height: 40px; right: 22px; }
-  header::after { width: 30px; height: 30px; top: 22px; }
   .card { padding: 16px 14px; }
   /* The 16px phone gutter can't hold 45px of lines, so use 3, 2, 1px lines with 3px gaps (15px). */
   .card::before {

@@ -411,26 +411,3 @@ code { font-size: 0.9em; }
 
 .net-viewing .net-help { display: none; }
 .net-toolbar + .note, .net-toolbar + .net-summary { margin-top: 12px; }
-
-/* ---------- palette trial panel (temporary) ---------- */
-
-.palette-trial {
-  position: fixed;
-  right: 12px;
-  bottom: 12px;
-  z-index: 20;
-  display: grid;
-  grid-template-columns: auto auto;
-  gap: 6px 10px;
-  align-items: center;
-  padding: 10px 12px;
-  background: #1b1a2e;
-  color: #fff;
-  font: 13px/1.2 system-ui, sans-serif;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-}
-
-.palette-trial label { display: contents; }
-.palette-trial select { font: inherit; }
-.palette-trial output { grid-column: 1 / -1; font-family: Consolas, monospace; opacity: 0.85; }

@@ -10,7 +10,9 @@
 </head>
 <body>
   <main>
-    <header>
+    <header id="hero">
+      <!-- animated circuit drawn round the title by drawHeroCircuit() in script.js -->
+      <svg class="hero-circuit" id="hero-circuit" aria-hidden="true"></svg>
       <h1>Resistance Calculator for running LEDs</h1>
       <p class="subtitle">A simple tool to calculate the resistor required to control voltage and current for LEDs.</p>
     </header>
@@ -348,13 +350,6 @@
         check your datasheet.</p>
     </footer>
   </main>
-
-  <!-- Temporary: palette trial. Remove once a palette is chosen. -->
-  <div class="palette-trial" id="palette-trial">
-    <label>Background <select id="pal-bg"></select></label>
-    <label>Palette <select id="pal-set"></select></label>
-    <output id="pal-hex"></output>
-  </div>
 
   <script src="script.js"></script>
 </body>
