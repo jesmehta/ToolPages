@@ -3,7 +3,7 @@
 Type text, get braille (UEB Grade 1) as clean dots in real millimetres, and download it as SVG, PNG or ZIP
 for a laser engraver, plotter, 3D print or hand embossing.
 
-Planned Cabinet address: <https://cabinetofcuriosities.in/text-to-braille/> (not mounted yet; see To do).
+Live at <https://cabinetofcuriosities.in/text-to-braille/> (Cabinet of Curiosities, under Machines & Makings).
 Locally, open [index.html](index.html) in a browser. Plain HTML/CSS/JS, no build step; JSZip is fetched from
 cdnjs only the first time a ZIP is asked for.
 
@@ -132,15 +132,18 @@ Stage-by-stage with screenshots: [CHANGELOG.md](CHANGELOG.md).
   stays visible while the dots are sunk.
 - 2026-11-22 — Title dots pop like cartoon mushrooms: overshoot and plop back on the way up, puff up then
   shrink away on the way down.
+- 2026-11-22 — Published on the Cabinet of Curiosities at `/text-to-braille/` (Machines & Makings), as a pinned
+  external mount of this folder.
 
 ## To do / watch out for
 
 - At 1:1 the dots are small on screen (1.5 mm ≈ 6 px); that's real size. Use the zoom for a closer look.
-- **Mount on Cabinet** at `/text-to-braille/`: pinned external mount of this folder + allowlist of every file the
-  page loads (index.html, style.css, theme.css, concrete-bg.svg, script.js, og-preview.jpg).
-  Then a push here needs `npm run update-externals` in Cabinet to go live.
-- **Link previews:** the `og:` URLs are absolute and point at the Cabinet, so they only work once it's mounted.
-  If the title or look changes, re-run `dev-tools/make-og-preview.js`; keep the image under ~300 KB (WhatsApp).
+- **Cabinet shows a pinned commit.** A push here does not change the live page: in CabinetOfCuriosities run
+  `npm run update-externals`, check the report, and add any new file the page loads to
+  `content/external-allowlists/text-to-braille.txt` (today: index.html, style.css, theme.css, concrete-bg.svg,
+  script.js, og-preview.jpg). The repo has GitHub Pages on, so a copy also sits at
+  jesmehta.github.io/ToolPages/TextToBraille/; the Cabinet URL is the one to share.
+- **Link previews:** the `og:` URLs are absolute and point at the Cabinet. If the title or look changes, re-run `dev-tools/make-og-preview.js`; keep the image under ~300 KB (WhatsApp).
   Test from WhatsApp on a phone (WhatsApp Web doesn't build previews).
 - Letters as outlines (opentype.js text-to-path, as in the origami tools) so the SVG doesn't depend on fonts.
 - Possible: Grade 2 contractions; other braille codes (Bharati braille for Indian scripts); a "dots only as
