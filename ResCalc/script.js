@@ -801,9 +801,8 @@ function drawHeroCircuit() {
   const yb = (y0 + y1) / 2;                       // battery, left edge
   const xs = x0 + L * 0.66, xc = xs + 34;         // switch pivot and contact, top edge
   const yr = (y0 + y1) / 2;                       // resistor, right edge
-  // three LEDs grouped in the middle of the bottom edge, 50px apart
-  const LED_PITCH = 50;
-  const leds = [-1, 0, 1].map(k => x0 + L / 2 + k * LED_PITCH);
+  // three LEDs spread evenly over the middle 40% of the bottom edge (30% … 70%)
+  const leds = [0.3, 0.5, 0.7].map(f => x0 + L * f);
   const LH = 9;                                   // half an LED's width
 
   // bottom edge: corner -> gaps round each LED -> corner

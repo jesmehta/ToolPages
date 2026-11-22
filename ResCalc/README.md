@@ -146,7 +146,7 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
   white, midnight blue, midnight green) and ~15 colour sets. The page is always dark now; it no longer follows the
   system light/dark setting.
 - **Animated circuit round the title**: the header's border is a working circuit (battery left, switch top,
-  resistor right, three LEDs in series grouped 50 px apart in the middle of the bottom edge). The LEDs point right,
+  resistor right, three LEDs in series at 30%, 50% and 70% of the bottom edge, i.e. spread over its middle 40%). The LEDs point right,
   so the battery's + plate faces down and current runs counter-clockwise. The switch opens and closes every 4 s
   and the LEDs light only while it's closed.
   The shape is drawn to the header's size by `drawHeroCircuit()` (redrawn on resize); the motion is CSS keyframes
@@ -200,8 +200,8 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
   colour; background symbols recoloured and faded to 18%. Circle-and-triangle beside the title replaced by an
   animated battery / switch / resistor / LED circuit running round the title as its border.
 - 2026-11-22 — Title circuit: three LEDs in series pointing right, evenly over the middle two-thirds of the
-  bottom edge; battery flipped to match; + label moved outside the border. Then grouped closer: 50 px apart,
-  centred (LED_PITCH in drawHeroCircuit).
+  bottom edge; battery flipped to match; + label moved outside the border. Then grouped closer: 50 px apart, and finally
+  spread over the middle 40% (30% / 50% / 70%).
 
 ## To do / watch out for
 
