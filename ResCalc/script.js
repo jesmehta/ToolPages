@@ -783,29 +783,24 @@ TABS.forEach(t => $(`tab-${t}`).addEventListener("click", () => showTab(t)));
 
 // ---------- palette trial (temporary) ----------
 //
-// Overrides --accent / --teal / --mustard on the page so candidate colour sets
-// can be compared live. Violet stays. In dark mode each colour is lightened a
-// little, like the theme's own dark values. Remove once a palette is chosen.
-
-const PAL_COLOURS = [
-  ["Tomato", "#E4572E"], ["Orange", "#E8731A"], ["Signal red", "#D62828"],
-  ["Fluoro pink", "#F2539B"], ["Copper", "#C8743A"], ["Coral", "#F0644B"],
-  ["Teal", "#1F8A85"], ["Green", "#2F8F46"], ["Cobalt", "#1D4E89"],
-  ["Riso teal", "#00838A"], ["PCB green", "#1E6B3A"], ["Slate blue", "#3A6EA5"],
-  ["Mustard", "#F2B134"], ["Yellow", "#E9B91F"], ["Chrome yellow", "#F2B705"],
-  ["Riso yellow", "#F7D417"], ["Solder gold", "#D9A93B"], ["Peach", "#F4A259"],
-];
+// One dropdown of candidate colour sets. Each set overrides the theme's four
+// colour variables (accent, second, third, fourth = the "violet" slot used by
+// the selected tab and toggles). Dark mode lightens them a little, like the
+// theme's own dark values. Remove once a palette is chosen.
 
 const PAL_SETS = {
-  "Current":          ["#E4572E", "#1F8A85", "#F2B134"],
-  "1. Resistor code": ["#E8731A", "#2F8F46", "#E9B91F"],
-  "2. Bauhaus":       ["#D62828", "#1D4E89", "#F2B705"],
-  "3. Risograph":     ["#F2539B", "#00838A", "#F7D417"],
-  "4. Circuit board": ["#C8743A", "#1E6B3A", "#D9A93B"],
-  "5. Dusk":          ["#F0644B", "#3A6EA5", "#F4A259"],
+  "Current (tomato · teal · mustard · violet)": ["#E4572E", "#1F8A85", "#F2B134", "#6C4AB6"],
+  "1. Resistor code":           ["#E8731A", "#2F8F46", "#E9B91F", "#2A62C9"],
+  "2. Bauhaus":                 ["#D62828", "#1D4E89", "#F2B705", "#2B2D42"],
+  "3. Risograph":               ["#F2539B", "#00838A", "#F7D417", "#3255A4"],
+  "4. Circuit board":           ["#C8743A", "#1E6B3A", "#D9A93B", "#22356B"],
+  "5. Resistor code + violet":  ["#E8731A", "#2F8F46", "#E9B91F", "#6C4AB6"],
+  "6. Bauhaus + violet":        ["#D62828", "#1D4E89", "#F2B705", "#6C4AB6"],
+  "7. Risograph + violet":      ["#F2539B", "#00838A", "#F7D417", "#6C4AB6"],
+  "8. Circuit board + violet":  ["#C8743A", "#1E6B3A", "#D9A93B", "#6C4AB6"],
 };
 
-const PAL_ROLES = ["pal-accent", "pal-teal", "pal-mustard"];
+const PAL_VARS = ["--accent", "--teal", "--mustard", "--violet"];
 
 function lighten(hex, amount) {
   const n = parseInt(hex.slice(1), 16);
@@ -813,36 +808,25 @@ function lighten(hex, amount) {
   return `#${mix(n >> 16)}${mix((n >> 8) & 255)}${mix(n & 255)}`;
 }
 
-function applyPalette() {
+function applyPalette(name) {
+  if (!PAL_SETS[name]) name = Object.keys(PAL_SETS)[0];
   const dark = matchMedia("(prefers-color-scheme: dark)").matches;
-  const picks = PAL_ROLES.map(id => $(id).value);
-  PAL_ROLES.forEach((id, k) => {
-    document.documentElement.style.setProperty($(id).dataset.var, dark ? lighten(picks[k], 0.25) : picks[k]);
-  });
-  const match = Object.entries(PAL_SETS).find(([, cs]) => cs.every((c, k) => c === picks[k]));
-  $("pal-set").value = match ? match[0] : "";
-  $("pal-hex").textContent = picks.join(" · ");
-  try { localStorage.setItem("rescalc-palette", JSON.stringify(picks)); } catch (e) { /* storage blocked */ }
+  const root = document.documentElement.style;
+  PAL_SETS[name].forEach((hex, k) => root.setProperty(PAL_VARS[k], dark ? lighten(hex, 0.25) : hex));
+  // text on the selected tab: white on dark fourth colours, ink on light ones
+  const fourth = dark ? lighten(PAL_SETS[name][3], 0.25) : PAL_SETS[name][3];
+  root.setProperty("--on-violet", textOn(fourth));
+  $("pal-set").value = name;
+  $("pal-hex").textContent = PAL_SETS[name].join(" · ");
+  try { localStorage.setItem("rescalc-palette-set", name); } catch (e) { /* storage blocked */ }
 }
 
-$("pal-set").innerHTML = `<option value="">(mixed)</option>` +
-  Object.keys(PAL_SETS).map(name => `<option value="${name}">${name}</option>`).join("");
-PAL_ROLES.forEach(id => {
-  $(id).innerHTML = PAL_COLOURS.map(([name, hex]) => `<option value="${hex}">${name}</option>`).join("");
-  $(id).addEventListener("change", applyPalette);
-});
-$("pal-set").addEventListener("change", e => {
-  const cs = PAL_SETS[e.target.value];
-  if (!cs) return;
-  PAL_ROLES.forEach((id, k) => { $(id).value = cs[k]; });
-  applyPalette();
-});
+$("pal-set").innerHTML = Object.keys(PAL_SETS).map(n => `<option value="${n}">${n}</option>`).join("");
+$("pal-set").addEventListener("change", e => applyPalette(e.target.value));
 {
   let saved = null;
-  try { saved = JSON.parse(localStorage.getItem("rescalc-palette")); } catch (e) { /* storage blocked */ }
-  const start = Array.isArray(saved) && saved.length === 3 ? saved : PAL_SETS.Current;
-  PAL_ROLES.forEach((id, k) => { $(id).value = start[k]; });
-  applyPalette();
+  try { saved = localStorage.getItem("rescalc-palette-set"); } catch (e) { /* storage blocked */ }
+  applyPalette(saved);
 }
 
 // ---------- wiring ----------
