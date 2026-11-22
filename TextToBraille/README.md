@@ -132,6 +132,8 @@ Stage-by-stage with screenshots: [CHANGELOG.md](CHANGELOG.md).
   stays visible while the dots are sunk.
 - 2026-11-22 — Title dots pop like cartoon mushrooms: overshoot and plop back on the way up, puff up then
   shrink away on the way down.
+- 2026-11-22 — Fix: "Empty dot positions" were drawn but invisible in the Signage look (dark grey `#454c56`
+  on the dark plate, 0.12 mm line). Now `#8b939d`, line width 20% of the dot radius (min 0.15 mm).
 - 2026-11-22 — Published on the Cabinet of Curiosities at `/text-to-braille/` (Machines & Makings), as a pinned
   external mount of this folder.
 

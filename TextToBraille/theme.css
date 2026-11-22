@@ -26,7 +26,7 @@
   --dome-hi: #ffffff;
   --dome-mid: #c3c9d0;
   --dome-lo: #6e7782;
-  --ghost: #454c56;
+  --ghost: #8b939d;            /* empty dot positions; must stand out from --sheet (was #454c56: invisible) */
   --label: #c3c9d0;
   --label-sign: var(--accent);
   --radius: 14px;

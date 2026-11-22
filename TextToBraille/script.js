@@ -310,7 +310,8 @@ function renderPreview(L, isEmpty) {
   }
   const r = f3(L.r);
   const parts = [domeDefs('pv-dome'), `<rect class="sheet" width="${f3(L.W)}" height="${f3(L.H)}"/>`];
-  if (S.ghost) parts.push(`<g class="empty">${L.empty.map(p => `<circle cx="${f3(p.x)}" cy="${f3(p.y)}" r="${r}"/>`).join('')}</g>`);
+  // outline width follows the dot size (in mm), so it stays visible at 1:1 and doesn't get heavy when scaled up
+  if (S.ghost) parts.push(`<g class="empty" stroke-width="${f3(Math.max(0.15, L.r * 0.2))}">${L.empty.map(p => `<circle cx="${f3(p.x)}" cy="${f3(p.y)}" r="${r}"/>`).join('')}</g>`);
   parts.push(`<g class="dots">${L.dots.map(p => `<circle cx="${f3(p.x)}" cy="${f3(p.y)}" r="${r}"/>`).join('')}</g>`);
   if (L.labels.length) parts.push(`<g class="labels" font-size="${f3(L.ls)}">${L.labels.map(t =>
     `<text x="${f3(t.x)}" y="${f3(t.y)}"${t.sign ? ' class="sign"' : ''}>${esc(t.text)}</text>`).join('')}</g>`);

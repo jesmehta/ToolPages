@@ -185,7 +185,7 @@ textarea:focus-visible, input:focus-visible, button:focus-visible, select:focus-
 .dome-hi { stop-color: var(--dome-hi, var(--dot)); }
 .dome-mid { stop-color: var(--dome-mid, var(--dot)); }
 .dome-lo { stop-color: var(--dome-lo, var(--dot)); }
-.preview .empty circle { fill: none; stroke: var(--ghost); stroke-width: 0.12; }
+.preview .empty circle { fill: none; stroke: var(--ghost); }   /* stroke-width set on the group by renderPreview() */
 .preview .labels text { fill: var(--label); text-anchor: middle; font-family: var(--font-body); }
 .preview .labels text.sign { fill: var(--label-sign); }
 
