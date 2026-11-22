@@ -26,7 +26,7 @@ The page has four tabs; each can be opened directly with a hash:
 
 | Input | Symbol | Presets |
 | --- | --- | --- |
-| Power source | V_source | USB 5 V, Wall adaptor 12 V |
+| Power source | V_source | USB 5 V, 12 V |
 | LED power | P_LED | 1 W, 3 W |
 | LED forward voltage | V_LED | 3.2 V |
 
