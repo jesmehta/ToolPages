@@ -783,21 +783,44 @@ TABS.forEach(t => $(`tab-${t}`).addEventListener("click", () => showTab(t)));
 
 // ---------- palette trial (temporary) ----------
 //
-// One dropdown of candidate colour sets. Each set overrides the theme's four
-// colour variables (accent, second, third, fourth = the "violet" slot used by
-// the selected tab and toggles). Dark mode lightens them a little, like the
-// theme's own dark values. Remove once a palette is chosen.
+// Two dropdowns: a background (the page's surface colours) and a colour set
+// (the theme's four colours: accent, second, third, and fourth = the "violet"
+// slot for the selected tab and toggles). Sets made for light backgrounds are
+// lightened a little on midnight blue; the midnight sets are used as they are.
+// Remove once a background and palette are chosen.
 
+const PAL_BACKGROUNDS = {
+  "Warm paper": { dark: false, vars: {
+    "--bg": "#f3ede2", "--card": "#fffaf1", "--text": "#1b1a2e", "--muted": "#5d5a70", "--border": "#1b1a2e",
+    "--rule": "#d8cfc0", "--error-bg": "#ffe1d6", "--error-text": "#8c2a10", "--resistor-body": "#e9d3a3", "--wire": "#3d3b52" } },
+  "Cool white": { dark: false, vars: {
+    "--bg": "#f3f5f9", "--card": "#ffffff", "--text": "#18203a", "--muted": "#58627a", "--border": "#18203a",
+    "--rule": "#d6dce7", "--error-bg": "#fde4e4", "--error-text": "#8a1c1c", "--resistor-body": "#e9d3a3", "--wire": "#38415a" } },
+  "Midnight blue": { dark: true, vars: {
+    "--bg": "#0d1830", "--card": "#14223f", "--text": "#e8eefa", "--muted": "#9eb0cf", "--border": "#d7e2f5",
+    "--rule": "#2a3c60", "--error-bg": "#4a1f2a", "--error-text": "#ffb4bd", "--resistor-body": "#d1bb8c", "--wire": "#b6c5de" } },
+  "Midnight green": { dark: true, vars: {
+    "--bg": "#0b1f1a", "--card": "#122a24", "--text": "#e8f3ee", "--muted": "#9dbdb1", "--border": "#d4e9e0",
+    "--rule": "#25443a", "--error-bg": "#4a1f22", "--error-text": "#ffb4b4", "--resistor-body": "#d1bb8c", "--wire": "#b1cfc2" } },
+};
+
+// [accent, second, third, fourth]; `forDark` sets are designed for midnight blue.
 const PAL_SETS = {
-  "Current (tomato · teal · mustard · violet)": ["#E4572E", "#1F8A85", "#F2B134", "#6C4AB6"],
-  "1. Resistor code":           ["#E8731A", "#2F8F46", "#E9B91F", "#2A62C9"],
-  "2. Bauhaus":                 ["#D62828", "#1D4E89", "#F2B705", "#2B2D42"],
-  "3. Risograph":               ["#F2539B", "#00838A", "#F7D417", "#3255A4"],
-  "4. Circuit board":           ["#C8743A", "#1E6B3A", "#D9A93B", "#22356B"],
-  "5. Resistor code + violet":  ["#E8731A", "#2F8F46", "#E9B91F", "#6C4AB6"],
-  "6. Bauhaus + violet":        ["#D62828", "#1D4E89", "#F2B705", "#6C4AB6"],
-  "7. Risograph + violet":      ["#F2539B", "#00838A", "#F7D417", "#6C4AB6"],
-  "8. Circuit board + violet":  ["#C8743A", "#1E6B3A", "#D9A93B", "#6C4AB6"],
+  "Current (tomato · teal · mustard · violet)": { c: ["#E4572E", "#1F8A85", "#F2B134", "#6C4AB6"] },
+  "1. Resistor code":           { c: ["#E8731A", "#2F8F46", "#E9B91F", "#2A62C9"] },
+  "2. Bauhaus":                 { c: ["#D62828", "#1D4E89", "#F2B705", "#2B2D42"] },
+  "3. Risograph":               { c: ["#F2539B", "#00838A", "#F7D417", "#3255A4"] },
+  "4. Circuit board":           { c: ["#C8743A", "#1E6B3A", "#D9A93B", "#22356B"] },
+  "5. Resistor code + violet":  { c: ["#E8731A", "#2F8F46", "#E9B91F", "#6C4AB6"] },
+  "6. Bauhaus + violet":        { c: ["#D62828", "#1D4E89", "#F2B705", "#6C4AB6"] },
+  "7. Risograph + violet":      { c: ["#F2539B", "#00838A", "#F7D417", "#6C4AB6"] },
+  "8. Circuit board + violet":  { c: ["#C8743A", "#1E6B3A", "#D9A93B", "#6C4AB6"] },
+  "M1. Neon (coral · cyan · amber · lavender)":  { forDark: true, c: ["#FF6B6B", "#4CC9F0", "#FFC857", "#B392F0"] },
+  "M2. Aurora (mint · sky · lemon · orchid)":    { forDark: true, c: ["#4FE0A0", "#6FA8FF", "#F2E86D", "#D17BE8"] },
+  "M3. Ember (orange · aqua · gold · violet)":   { forDark: true, c: ["#FF8F4D", "#3DD6C6", "#F2C94C", "#9D7BFF"] },
+  "G1. Lantern (apricot · sky · lemon · lavender)": { forDark: true, green: true, c: ["#FF9E5E", "#7FC8F8", "#F4E285", "#B8A1F2"] },
+  "G2. Reef (coral · turquoise · gold · orchid)":   { forDark: true, green: true, c: ["#FF6F61", "#4FD8C8", "#F6C744", "#E58BD8"] },
+  "G3. Copper (copper · mint · cream · violet)":    { forDark: true, green: true, c: ["#E8895A", "#7BE0AD", "#F1E3B5", "#A88BFA"] },
 };
 
 const PAL_VARS = ["--accent", "--teal", "--mustard", "--violet"];
@@ -808,25 +831,40 @@ function lighten(hex, amount) {
   return `#${mix(n >> 16)}${mix((n >> 8) & 255)}${mix(n & 255)}`;
 }
 
-function applyPalette(name) {
-  if (!PAL_SETS[name]) name = Object.keys(PAL_SETS)[0];
-  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+function applyPalette() {
+  let bgName = $("pal-bg").value, setName = $("pal-set").value;
+  if (!PAL_BACKGROUNDS[bgName]) bgName = "Warm paper";
+  if (!PAL_SETS[setName]) setName = Object.keys(PAL_SETS)[0];
+  const bg = PAL_BACKGROUNDS[bgName], set = PAL_SETS[setName];
   const root = document.documentElement.style;
-  PAL_SETS[name].forEach((hex, k) => root.setProperty(PAL_VARS[k], dark ? lighten(hex, 0.25) : hex));
-  // text on the selected tab: white on dark fourth colours, ink on light ones
-  const fourth = dark ? lighten(PAL_SETS[name][3], 0.25) : PAL_SETS[name][3];
-  root.setProperty("--on-violet", textOn(fourth));
-  $("pal-set").value = name;
-  $("pal-hex").textContent = PAL_SETS[name].join(" · ");
-  try { localStorage.setItem("rescalc-palette-set", name); } catch (e) { /* storage blocked */ }
+
+  Object.entries(bg.vars).forEach(([k, v]) => root.setProperty(k, v));
+  root.colorScheme = bg.dark ? "dark" : "light";
+
+  const colours = set.c.map(hex => (bg.dark && !set.forDark ? lighten(hex, 0.25) : hex));
+  colours.forEach((hex, k) => root.setProperty(PAL_VARS[k], hex));
+  root.setProperty("--on-violet", textOn(colours[3]));
+
+  $("pal-hex").textContent = colours.join(" · ");
+  try { localStorage.setItem("rescalc-palette-trial", JSON.stringify({ bg: bgName, set: setName })); } catch (e) { /* storage blocked */ }
 }
 
-$("pal-set").innerHTML = Object.keys(PAL_SETS).map(n => `<option value="${n}">${n}</option>`).join("");
-$("pal-set").addEventListener("change", e => applyPalette(e.target.value));
+$("pal-bg").innerHTML = Object.keys(PAL_BACKGROUNDS).map(n => `<option>${n}</option>`).join("");
+const setOption = n => `<option>${n}</option>`;
+const setNames = Object.keys(PAL_SETS);
+$("pal-set").innerHTML =
+  `<optgroup label="For light backgrounds">${setNames.filter(n => !PAL_SETS[n].forDark).map(setOption).join("")}</optgroup>` +
+  `<optgroup label="For midnight blue">${setNames.filter(n => PAL_SETS[n].forDark && !PAL_SETS[n].green).map(setOption).join("")}</optgroup>` +
+  `<optgroup label="For midnight green">${setNames.filter(n => PAL_SETS[n].green).map(setOption).join("")}</optgroup>`;
+$("pal-bg").addEventListener("change", applyPalette);
+$("pal-set").addEventListener("change", applyPalette);
 {
   let saved = null;
-  try { saved = localStorage.getItem("rescalc-palette-set"); } catch (e) { /* storage blocked */ }
-  applyPalette(saved);
+  try { saved = JSON.parse(localStorage.getItem("rescalc-palette-trial")); } catch (e) { /* storage blocked */ }
+  const osDark = matchMedia("(prefers-color-scheme: dark)").matches;
+  $("pal-bg").value = saved?.bg || (osDark ? "Midnight blue" : "Warm paper");
+  $("pal-set").value = saved?.set || setNames[0];
+  applyPalette();
 }
 
 // ---------- wiring ----------
