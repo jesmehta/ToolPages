@@ -53,8 +53,8 @@
 body {
   margin: 0;
   background-color: var(--bg);
-  /* faint electrical symbols, scattered Memphis-style (see postmodern-bg.svg) */
-  background-image: url("postmodern-bg.svg");
+  /* faint electrical symbols, scattered Memphis-style (see bg-symbols.svg) */
+  background-image: url("bg-symbols.svg");
   background-size: 360px 360px;
   color: var(--text);
   font-family: var(--font-body);

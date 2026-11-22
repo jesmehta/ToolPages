@@ -122,11 +122,12 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
 ## Files
 
 - `index.html` — page structure and inputs
-- `style.css` — base layout and plain light/dark colours
-- `themes/*.css` — visual themes layered on top of the base (fonts, colours, decoration); each imports its own Google Fonts
-- `themes/postmodern-bg.svg` — the postmodern theme's faint electrical-symbol background tile
+- `style.css` — base layout and plain light/dark colours (the page still works with only this)
+- `theme.css` — the look, layered on top: Google Fonts (Bricolage Grotesque, Instrument Sans/Serif, IBM Plex Mono),
+  tomato / teal / mustard / violet palette, ink outlines, stepped accent lines left of each card
+- `bg-symbols.svg` — faint Memphis-style background tile of electrical symbols, used by `theme.css`
 - `script.js` — LED calculation (shared by tabs 1–2), equivalent-resistance network, resistor finder, value parsing,
-  E24 lookup, colour-band encoding, resistor / circuit / network SVG drawing, tabs, theme picker
+  E24 lookup, colour-band encoding, resistor / circuit / network SVG drawing, tabs
 
 ## Changelog
 
@@ -146,12 +147,14 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
   4 (Resistor finder: value → 4/5-band colour code with a band-by-band key). Text value input with k/M/RKM parsing.
 - 2026-11-22 — Resistor finder simplified to one row: resistor needed | closest standard (E24) | colour bands.
   Removed band-count and tolerance options and the band key.
+- 2026-11-22 — Look finalised. Solid drop shadows replaced by stepped left-edge lines (5→1px, 6px gaps; 3→1px on
+  phones); rule under the tab pills removed. Theme trial closed: postmodern kept as `theme.css`, the notebook /
+  datasheet / memphis themes and the picker removed (they're in git history, commits 7928cd7, f00a7fe, 262ddeb).
 
 ## To do / watch out for
 
-- **Theme trial is open.** Once a theme is chosen: keep that file (or fold it into `style.css`), delete the others,
-  and remove the picker (`.theme-picker` in `index.html` / `style.css`, the theme block in `script.js`).
-- Memphis: the confetti background runs behind the title, subtitle and footer text; may need calming down if chosen.
+- The stepped lines sit outside the card, so they need the left gutter: 45px on desktop, 15px on phones. If the
+  page's side padding shrinks, they'll be clipped.
 - The page title and subtitle still talk only about LEDs, but tabs 3 and 4 are general resistor tools.
 - Possible: a reverse finder (pick colours → value), E96 suggestions for 5-band, nested networks.
 

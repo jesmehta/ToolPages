@@ -538,27 +538,6 @@ function showTab(name) {
 
 TABS.forEach(t => $(`tab-${t}`).addEventListener("click", () => showTab(t)));
 
-// ---------- theme trial (temporary) ----------
-
-const THEMES = ["postmodern", "notebook", "datasheet", "memphis", "plain"];
-
-function setTheme(name) {
-  if (!THEMES.includes(name)) name = "postmodern";
-  const link = $("theme-css");
-  if (name === "plain") link.removeAttribute("href");
-  else link.setAttribute("href", `themes/${name}.css`);
-  document.documentElement.dataset.theme = name;
-  $("theme-select").value = name;
-  try { localStorage.setItem("rescalc-theme", name); } catch (e) { /* storage blocked */ }
-}
-
-$("theme-select").addEventListener("change", e => setTheme(e.target.value));
-{
-  let saved = null;
-  try { saved = localStorage.getItem("rescalc-theme"); } catch (e) { /* storage blocked */ }
-  setTheme(new URLSearchParams(location.search).get("theme") || saved || "postmodern");
-}
-
 // ---------- wiring ----------
 
 document.querySelectorAll("#panel-single input").forEach(el => el.addEventListener("input", updateSingle));
