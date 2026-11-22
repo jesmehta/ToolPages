@@ -108,14 +108,17 @@ h1 {
   letter-spacing: -0.02em;
 }
 
-/* squiggle underline under the title */
+/* squiggle underline under the title, in the accent colour (the SVG is a mask) */
 h1::after {
+  --squiggle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='10'%3E%3Cpath d='M0 5 Q6 0 12 5 T24 5' fill='none' stroke='black' stroke-width='2.5'/%3E%3C/svg%3E");
   content: "";
   display: block;
   width: 120px;
   height: 10px;
   margin-top: 10px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='10'%3E%3Cpath d='M0 5 Q6 0 12 5 T24 5' fill='none' stroke='%23e4572e' stroke-width='2.5'/%3E%3C/svg%3E") repeat-x;
+  background: var(--accent);
+  -webkit-mask: var(--squiggle) repeat-x;
+  mask: var(--squiggle) repeat-x;
 }
 
 h2 {
