@@ -76,23 +76,27 @@ supply 312.5 mA / 3.75 W, 80% efficiency.
 
 ### Equivalent resistance
 
-Any **series/parallel combination**, built as nested groups. The whole network is one group ("Network");
-each group has a **Series / Parallel** switch and holds resistors and/or further groups, to any depth.
-Groups are labelled by position: G1, G2 inside the network, G1.1, G1.2 inside G1, and so on.
+**The diagram is the editor.** It starts as `A ── R ── B` with one 100 Ω resistor. Every resistor has:
 
-- Buttons per group: **+ resistor**, **+ series/parallel group** (adds a group of the other kind with two
-  100 Ω resistors), × to remove an item (hidden when it's the only item left in its group).
-- Series group: R = R1 + R2 + …   Parallel group: R = 1 / (1/R1 + 1/R2 + …)
-- A one-line summary above the diagram, e.g. `A ── 100 Ω + (220 Ω ∥ 220 Ω) ── B`.
-- The diagram is laid out recursively (series side by side, parallel stacked between two rails; shorter
-  branches are wired out to the rail). Each resistor is drawn in its own colour bands.
-- Working is shown innermost group first, one row per group, then the total and closest E24 value.
+- **+** on the left / right → add a resistor in **series** before / after it,
+- **+** above / below → add a resistor in **parallel** above / below it,
+- a **dropdown** of standard E24 values (1 Ω … 10 MΩ, grouped by decade),
+- **×** to remove it (not shown on the last remaining resistor).
 
-Default: 100 Ω + (220 Ω ∥ 220 Ω) = 210 Ω.
+A new resistor starts with the value of the one whose + was clicked (so 220 ∥ 220 is one click). Where two
+neighbouring + buttons would do exactly the same thing, only one is shown. Growing one resistor at a time like
+this can build **any** series/parallel network, e.g. (R1 + R2) ∥ R3: start with R1, + below for R3, + right of R1
+for R2.
 
-Not possible: **bridge** networks (e.g. a Wheatstone bridge) — they aren't series/parallel, so no nesting of
-groups can describe them. They would need a node-based model (resistors between named points, solved with
-nodal analysis).
+**Edit | View** toggle: Edit shows all the controls; View hides them, packs the resistors tightly and labels
+each with its value — a clean diagram for reading or a screenshot.
+
+Also shown: a one-line summary (`A ── (100 Ω + 220 Ω) ∥ 470 Ω ── B`), the working innermost-first (one row
+per series or parallel group), the total and the closest E24 value with its bands. Wide circuits scroll
+sideways inside the card rather than shrinking the controls.
+
+Not possible: **bridge** networks (e.g. a Wheatstone bridge) — they aren't series/parallel. They would need a
+node-based model (resistors between named points, solved with nodal analysis).
 
 ### Resistor finder
 
@@ -122,9 +126,11 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
 - **Each tab has its own inputs**, so the multiple tab can default to 12 V while the single tab keeps 5 V.
   Both tabs run the same `calculate()`; the single tab is n_series = n_parallel = 1.
 - **Sliders go down to 0** as asked; at 0 the diagram shows "No LEDs" and the results ask for at least 1.
-- **Equivalent resistance as a tree** (2026-11-22, replacing the first "series of parallel blocks" model, which
-  couldn't do e.g. (220 + 220) ∥ 470). Nested boxes were chosen over a typed expression like
-  `100 + (220 || 220)`; the summary line shows the expression form read-only. Bridges are out of scope (see above).
+- **Equivalent resistance: diagram as the editor** (2026-11-22). History: v1 was "series of parallel blocks"
+  (couldn't do (220 + 220) ∥ 470); v2 a tree edited as nested Series/Parallel boxes (complete, but looked
+  complicated). v3 keeps the same tree underneath but edits it through + buttons on each resistor, so the
+  user only ever picks one value at a time — no group or series/parallel choices. Values come from an E24
+  dropdown rather than free text, so the tab can't be given a bad value.
 - **Values typed as text** (not number boxes) so `4k7` and `2.2k` work the way they're printed on parts lists.
 - **Finder kept to one row** (user request, 2026-11-22): the first version had 4/5-band and tolerance choices and
   a band-by-band key; that was more than people need when hunting through a parts box. It now always shows the
@@ -170,6 +176,8 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
   Custom always in column 3, leaving a gap where a group has one preset. Phones: Custom on its own line.
 - 2026-11-22 — Equivalent resistance rebuilt as a tree: nested series/parallel groups to any depth,
   recursive diagram, summary line, per-group working.
+- 2026-11-22 — Equivalent resistance: the diagram is now the editor (+ buttons for series/parallel, value
+  dropdown, ×), replacing the nested boxes. Edit | View toggle for a clean diagram.
 
 ## To do / watch out for
 
@@ -177,7 +185,7 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
   page's side padding shrinks, they'll be clipped.
 - The page title and subtitle still talk only about LEDs, but tabs 3 and 4 are general resistor tools.
 - Possible: E96 suggestions for 5-band; a typed-expression input for the equivalent tab; bridge networks.
-- Very deep / wide networks make the diagram small on phones (it scales to fit the card).
+- Big networks get wide in Edit mode (150 px per resistor); they scroll sideways in the card.
 
 - Slider maxima (12 series, 10 parallel) are arbitrary; raise them in `index.html` if needed. Large arrays make the
   diagram small on phones.
