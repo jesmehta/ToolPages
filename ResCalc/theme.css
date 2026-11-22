@@ -164,8 +164,8 @@ header h1, header .subtitle { text-align: center; text-wrap: balance; }
 
 /* Stepped lines down the outside of each card, thinning to nothing: reading
    outward from the card, a 6px gap then lines of 5, 4, 3, 2 and 1px, each
-   separated by 4px (37px in all). Full strength on the left, mirrored on the
-   right at half strength. The pattern lives in --steps so both sides share it. */
+   separated by 4px (37px in all). Drawn on the left and mirrored on the
+   right, both at full strength. The pattern lives in --steps so both sides share it. */
 .card {
   position: relative;
   background: var(--card);
@@ -194,7 +194,7 @@ header h1, header .subtitle { text-align: center; text-wrap: balance; }
 }
 
 .card::before { right: calc(100% + 2px); background: linear-gradient(to left, var(--steps)); }
-.card::after  { left: calc(100% + 2px);  background: linear-gradient(to right, var(--steps)); opacity: 0.5; }
+.card::after  { left: calc(100% + 2px);  background: linear-gradient(to right, var(--steps)); }
 
 /* Each panel's cards: inputs = teal, circuit = mustard, results = tomato */
 [role="tabpanel"] .card:nth-of-type(1) { --card-accent: var(--teal); }
