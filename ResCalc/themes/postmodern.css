@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@1&display=swap");
 
-/* Postmodern-but-serious: ink outlines, hard offset shadows, warm paper,
+/* Postmodern-but-serious: ink outlines, stepped accent lines on the left of each card, warm paper,
    a small set of bold accent colours, and a few geometric flourishes. */
 
 :root {
@@ -15,7 +15,6 @@
   --mustard: #f2b134;
   --violet: #6c4ab6;
   --on-violet: #ffffff;
-  --shadow: 5px 5px 0;
   --error-bg: #ffe1d6;
   --error-text: #8c2a10;
   --resistor-body: #e9d3a3;
@@ -143,12 +142,32 @@ h3 { margin: 26px 0 10px; font-size: 1.05rem; font-weight: 600; }
 /* ---------- cards ---------- */
 
 .card {
+  position: relative;
   background: var(--card);
   border: 2px solid var(--border);
   border-radius: 4px;
   padding: 20px 22px;
   margin-bottom: 22px;
-  box-shadow: var(--shadow) var(--card-accent, var(--accent));
+}
+
+/* Stepped lines down the outside of the left edge, thinning to nothing:
+   reading outward from the card, a 6px gap then lines of 5, 4, 3, 2 and 1px,
+   each separated by 6px (45px in all). */
+.card::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  right: calc(100% + 2px);
+  width: 45px;
+  --c: var(--card-accent, var(--accent));
+  background: linear-gradient(to left,
+    transparent 0 6px,   var(--c) 6px 11px,
+    transparent 11px 17px, var(--c) 17px 21px,
+    transparent 21px 27px, var(--c) 27px 30px,
+    transparent 30px 36px, var(--c) 36px 38px,
+    transparent 38px 44px, var(--c) 44px 45px);
+  pointer-events: none;
 }
 
 /* Each panel's cards: inputs = teal, circuit = mustard, results = tomato */
@@ -174,15 +193,14 @@ h3 { margin: 26px 0 10px; font-size: 1.05rem; font-weight: 600; }
   background: var(--card);
   color: var(--text);
   cursor: pointer;
-  transition: transform 0.12s, box-shadow 0.12s;
+  transition: background 0.12s;
 }
 
-.tabs button:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--border); }
+.tabs button:hover { background: var(--bg); }
 
 .tabs button[aria-selected="true"] {
   background: var(--violet);
   color: var(--on-violet);
-  box-shadow: 3px 3px 0 var(--border);
 }
 
 .tabs button:focus-visible { outline: 3px dashed var(--accent); outline-offset: 3px; }
@@ -227,7 +245,7 @@ input[type="number"] {
 }
 
 input[type="number"]:disabled { opacity: 0.35; }
-input[type="number"]:focus { outline: none; box-shadow: 3px 3px 0 var(--accent); }
+input[type="number"]:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ---------- sliders ---------- */
 
@@ -357,7 +375,15 @@ footer {
   table.calc .value { white-space: normal; }
   header::before { width: 40px; height: 40px; right: 22px; }
   header::after { width: 30px; height: 30px; top: 22px; }
-  .card { padding: 16px 14px; box-shadow: 4px 4px 0 var(--card-accent, var(--accent)); }
+  .card { padding: 16px 14px; }
+  /* The 16px phone gutter can't hold 45px of lines, so use 3, 2, 1px lines with 3px gaps (15px). */
+  .card::before {
+    width: 15px;
+    background: linear-gradient(to left,
+      transparent 0 3px,   var(--c) 3px 6px,
+      transparent 6px 9px, var(--c) 9px 11px,
+      transparent 11px 14px, var(--c) 14px 15px);
+  }
   table.calc .formula { display: none; }
   .choice-grid { gap: 6px 8px; }
   .cg-val { font-size: 1.05rem; }
@@ -372,12 +398,11 @@ footer {
   border: 2px solid var(--border);
   border-radius: 3px;
   background: var(--card);
-  box-shadow: 3px 3px 0 var(--teal);
-  transition: transform 0.12s, box-shadow 0.12s;
+  transition: background 0.12s;
 }
 
-.btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--teal); }
-.btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--teal); }
+.btn:hover { background: var(--bg); }
+.btn:active { background: var(--mustard); color: #1b1a2e; }
 
 .r-input {
   border: 2px solid var(--border);
@@ -387,7 +412,7 @@ footer {
   font-size: 0.95rem;
 }
 
-.r-input:focus { outline: none; box-shadow: 3px 3px 0 var(--accent); }
+.r-input:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
 .r-input.invalid { border-color: var(--accent); background: var(--error-bg); box-shadow: none; }
 
 code { font-family: var(--font-mono); font-size: 0.85em; }
