@@ -216,6 +216,7 @@ A stage-by-stage visual version, with screenshots, is in [CHANGELOG.md](CHANGELO
 - 2026-11-22 — Background symbols straightened: same scattered positions, each horizontal or vertical (no tilt).
 - 2026-11-22 — Published on the Cabinet of Curiosities at `/resistor-calculator/` (Machines & Makings), as a pinned
   external mount of this folder.
+- 2026-11-22 — "← Cabinet of Curiosities" link above the title (small, mono, muted; accent on hover).
 
 ## To do / watch out for
 
