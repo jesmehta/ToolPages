@@ -80,7 +80,8 @@ supply 312.5 mA / 3.75 W, 80% efficiency.
 
 - **+** on the left / right → add a resistor in **series** before / after it,
 - **+** above / below → add a resistor in **parallel** above / below it,
-- a **dropdown** of standard E24 values (1 Ω … 10 MΩ, grouped by decade),
+- two short **dropdowns** for its value: an E24 number (1.0 … 9.1) and a multiplier (× 1 Ω … × 10 MΩ),
+  so 4.7 × 1 kΩ = 4.7 kΩ; range 1 Ω … 91 MΩ, standard values only,
 - **×** to remove it (not shown on the last remaining resistor).
 
 Terminal **A** has a **+** on its right and **B** one on its left: they add a resistor in series at the very
@@ -132,8 +133,9 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
 - **Equivalent resistance: diagram as the editor** (2026-11-22). History: v1 was "series of parallel blocks"
   (couldn't do (220 + 220) ∥ 470); v2 a tree edited as nested Series/Parallel boxes (complete, but looked
   complicated). v3 keeps the same tree underneath but edits it through + buttons on each resistor, so the
-  user only ever picks one value at a time — no group or series/parallel choices. Values come from an E24
-  dropdown rather than free text, so the tab can't be given a bad value.
+  user only ever picks one value at a time — no group or series/parallel choices. Values come from E24
+  number + multiplier dropdowns rather than free text, so the tab can't be given a bad value. (One long
+  169-entry list was tried first; two short lists are much quicker to use.)
 - **Values typed as text** (not number boxes) so `4k7` and `2.2k` work the way they're printed on parts lists.
 - **Finder kept to one row** (user request, 2026-11-22): the first version had 4/5-band and tolerance choices and
   a band-by-band key; that was more than people need when hunting through a parts box. It now always shows the
@@ -182,6 +184,7 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
 - 2026-11-22 — Equivalent resistance: the diagram is now the editor (+ buttons for series/parallel, value
   dropdown, ×), replacing the nested boxes. Edit | View toggle for a clean diagram.
 - 2026-11-22 — + beside terminals A and B: add a resistor in series at the start / end of the circuit.
+- 2026-11-22 — Resistor value picked with two dropdowns (E24 number × multiplier) instead of one long list.
 
 ## To do / watch out for
 
@@ -189,7 +192,7 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
   page's side padding shrinks, they'll be clipped.
 - The page title and subtitle still talk only about LEDs, but tabs 3 and 4 are general resistor tools.
 - Possible: E96 suggestions for 5-band; a typed-expression input for the equivalent tab; bridge networks.
-- Big networks get wide in Edit mode (150 px per resistor); they scroll sideways in the card.
+- Big networks get wide in Edit mode (170 px per resistor); they scroll sideways in the card.
 
 - Slider maxima (12 series, 10 parallel) are arbitrary; raise them in `index.html` if needed. Large arrays make the
   diagram small on phones.

@@ -269,10 +269,13 @@ code { font-size: 0.9em; }
 .net-canvas { position: relative; margin: 0 auto; }
 .net-canvas svg { position: absolute; inset: 0; }
 
-.net-add, .net-del, .net-value {
+.net-add, .net-del, .net-pick {
   position: absolute;
   transform: translate(-50%, -50%);
 }
+
+/* number + multiplier dropdowns under each resistor */
+.net-pick { display: flex; gap: 3px; white-space: nowrap; }
 
 .net-add {
   width: 22px; height: 22px;
@@ -303,10 +306,9 @@ code { font-size: 0.9em; }
 .net-del:hover { color: var(--accent); }
 
 .net-value {
-  width: 92px;
   font: inherit;
-  font-size: 0.85rem;
-  padding: 2px 4px;
+  font-size: 0.8rem;
+  padding: 2px 2px;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--card);

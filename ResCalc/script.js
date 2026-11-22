@@ -335,18 +335,32 @@ const isGroup = n => n.type !== "r";
 
 let equivRoot = R(100);
 
-// Standard E24 values offered in each resistor's dropdown: 1 Ω … 10 MΩ.
-const E24_PICK = E24_ALL.filter(v => v >= 1 && v <= 1e7);
+// Each resistor's value is picked with two short dropdowns: an E24 number
+// (1.0 … 9.1) and a multiplier (× 1 Ω … × 10 MΩ), so 1 Ω … 91 MΩ.
+const MULTIPLIERS = [
+  [0, "× 1 Ω"], [1, "× 10 Ω"], [2, "× 100 Ω"], [3, "× 1 kΩ"],
+  [4, "× 10 kΩ"], [5, "× 100 kΩ"], [6, "× 1 MΩ"], [7, "× 10 MΩ"],
+];
 
-function valueOptions(selected) {
-  let html = "";
-  for (let d = 0; d < E24_PICK.length; d += 24) {
-    const decade = E24_PICK.slice(d, d + 24);
-    html += `<optgroup label="${fmtOhms(decade[0])} – ${fmtOhms(decade[decade.length - 1])}">` +
-      decade.map(v => `<option value="${v}"${v === selected ? " selected" : ""}>${fmtOhms(v)}</option>`).join("") +
-      `</optgroup>`;
-  }
-  return html;
+// 4700 -> { nom: 4.7, exp: 3 }
+function splitValue(v) {
+  const exp = Math.floor(Math.log10(v) + 1e-9);
+  return { nom: +(v / Math.pow(10, exp)).toFixed(1), exp };
+}
+
+const joinValue = (nom, exp) => +(nom * Math.pow(10, exp)).toPrecision(3);
+
+function valuePicker(n, at) {
+  const { nom, exp } = splitValue(n.v);
+  return `
+    <span class="net-pick" ${at}>
+      <select class="net-value net-nom" data-id="${n.id}" aria-label="Resistor value">
+        ${E24.map(d => `<option value="${d}"${d === nom ? " selected" : ""}>${d.toFixed(1)}</option>`).join("")}
+      </select>
+      <select class="net-value net-mult" data-id="${n.id}" aria-label="Multiplier">
+        ${MULTIPLIERS.map(([e, label]) => `<option value="${e}"${e === exp ? " selected" : ""}>${label}</option>`).join("")}
+      </select>
+    </span>`;
 }
 
 function findNode(id, node = equivRoot, parent = null) {
@@ -448,7 +462,7 @@ function smallResistorSvg(cx, y, bands, label) {
 
 // Edit mode leaves room round each resistor for its + buttons and dropdown;
 // view mode packs resistors tightly with just a value label.
-const CELLS = { edit: { w: 150, h: 120, up: 46 }, view: { w: 84, h: 54, up: 20 } };
+const CELLS = { edit: { w: 170, h: 120, up: 46 }, view: { w: 84, h: 54, up: 20 } };
 const RAILS = { edit: 16, view: 12 };
 let equivMode = "edit";
 let CELL = CELLS.edit, RAIL = RAILS.edit;
@@ -514,7 +528,7 @@ function layout(n, x, top, parent = null) {
         (n === equivRoot ? "" :
           `<button type="button" class="net-del" data-act="del" data-id="${n.id}" ${at(cx + 36, y - 16)}
                    title="Remove this resistor" aria-label="Remove this resistor">×</button>`) +
-        `<select class="net-value" data-id="${n.id}" ${at(cx, y + 28)} aria-label="Resistor value">${valueOptions(n.v)}</select>`,
+        valuePicker(n, at(cx, y + 28)),
     };
   }
 
@@ -633,9 +647,13 @@ $("e-mode").addEventListener("click", e => {
 $("e-canvas").addEventListener("change", e => {
   const sel = e.target.closest("select.net-value");
   if (!sel) return;
-  findNode(+sel.dataset.id).node.v = +sel.value;
+  const pick = sel.closest(".net-pick");
+  const nom = +pick.querySelector(".net-nom").value;
+  const exp = +pick.querySelector(".net-mult").value;
+  findNode(+sel.dataset.id).node.v = joinValue(nom, exp);
   updateEquiv();
-  $("e-canvas").querySelector(`select[data-id="${sel.dataset.id}"]`)?.focus();
+  const which = sel.classList.contains("net-nom") ? "net-nom" : "net-mult";
+  $("e-canvas").querySelector(`select.${which}[data-id="${sel.dataset.id}"]`)?.focus();
 });
 
 // ---------- tab 4: resistor finder ----------
