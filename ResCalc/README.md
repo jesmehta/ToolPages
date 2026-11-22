@@ -142,6 +142,13 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
   closest E24 value as a 4-band ±5% code. 5-band/E96 could come back as an option if wanted.
 - **One band encoder** (`bandCode`, takes a digit count, currently always 2); colour bands everywhere use it. Multiplier is limited to
   silver (×0.01) … white (×1G); outside that the finder says it can't be shown.
+- **Midnight blue + Neon palette** (2026-11-22): chosen from a live trial of four backgrounds (warm paper, cool
+  white, midnight blue, midnight green) and ~15 colour sets. The page is always dark now; it no longer follows the
+  system light/dark setting.
+- **Animated circuit round the title**: the header's border is a working circuit (battery left, switch top,
+  resistor right, LED bottom). The switch opens and closes every 4 s and the LED lights only while it's closed.
+  The shape is drawn to the header's size by `drawHeroCircuit()` (redrawn on resize); the motion is CSS keyframes
+  with shared timing. With reduced motion turned on, it holds still with the switch closed and the LED lit.
 - **No libraries**: unlike the other ToolPages tools, this needs no canvas drawing, so p5.js isn't used. The resistor
   is a small inline SVG.
 
@@ -150,8 +157,10 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
 - `index.html` — page structure and inputs
 - `style.css` — base layout and plain light/dark colours (the page still works with only this)
 - `theme.css` — the look, layered on top: Google Fonts (Bricolage Grotesque, Instrument Sans/Serif, IBM Plex Mono),
-  tomato / teal / mustard / violet palette, ink outlines, stepped accent lines left of each card
-- `bg-symbols.svg` — faint Memphis-style background tile of electrical symbols, used by `theme.css`
+  midnight-blue background with the "Neon" colours (coral `#FF6B6B`, cyan `#4CC9F0`, amber `#FFC857`, lavender
+  `#B392F0`), light outlines, stepped accent lines left of each card, and the animated title circuit's styles.
+  The colour variables keep their original role names (`--accent`, `--teal`, `--mustard`, `--violet`).
+- `bg-symbols.svg` — faint (18% opacity) Memphis-style background tile of electrical symbols in the same four colours
 - `script.js` — LED calculation (shared by tabs 1–2), equivalent-resistance network, resistor finder, value parsing,
   E24 lookup, colour-band encoding, resistor / circuit / network SVG drawing, tabs
 
@@ -185,6 +194,9 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
   dropdown, ×), replacing the nested boxes. Edit | View toggle for a clean diagram.
 - 2026-11-22 — + beside terminals A and B: add a resistor in series at the start / end of the circuit.
 - 2026-11-22 — Resistor value picked with two dropdowns (E24 number × multiplier) instead of one long list.
+- 2026-11-22 — Palette trial (temporary panel) → midnight blue with the Neon set; title squiggle follows the accent
+  colour; background symbols recoloured and faded to 18%. Circle-and-triangle beside the title replaced by an
+  animated battery / switch / resistor / LED circuit running round the title as its border.
 
 ## To do / watch out for
 
