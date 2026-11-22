@@ -76,15 +76,23 @@ supply 312.5 mA / 3.75 W, 80% efficiency.
 
 ### Equivalent resistance
 
-The network is a chain of **blocks in series**; each block holds **one or more resistors in parallel**
-(e.g. 100 Ω + (220 Ω ∥ 220 Ω) = 210 Ω). Buttons add a resistor to a block ("+ parallel"), add a block
-("+ Add block in series"), or remove either. The diagram (terminals A and B) redraws live, with each resistor
-in its own colour bands.
+Any **series/parallel combination**, built as nested groups. The whole network is one group ("Network");
+each group has a **Series / Parallel** switch and holds resistors and/or further groups, to any depth.
+Groups are labelled by position: G1, G2 inside the network, G1.1, G1.2 inside G1, and so on.
 
-- Block: R = 1 / (1/R1 + 1/R2 + …)
-- Total: R_eq = R_block1 + R_block2 + …
+- Buttons per group: **+ resistor**, **+ series/parallel group** (adds a group of the other kind with two
+  100 Ω resistors), × to remove an item (hidden when it's the only item left in its group).
+- Series group: R = R1 + R2 + …   Parallel group: R = 1 / (1/R1 + 1/R2 + …)
+- A one-line summary above the diagram, e.g. `A ── 100 Ω + (220 Ω ∥ 220 Ω) ── B`.
+- The diagram is laid out recursively (series side by side, parallel stacked between two rails; shorter
+  branches are wired out to the rail). Each resistor is drawn in its own colour bands.
+- Working is shown innermost group first, one row per group, then the total and closest E24 value.
 
-Results show the working per block, the total, and the closest E24 value with its bands.
+Default: 100 Ω + (220 Ω ∥ 220 Ω) = 210 Ω.
+
+Not possible: **bridge** networks (e.g. a Wheatstone bridge) — they aren't series/parallel, so no nesting of
+groups can describe them. They would need a node-based model (resistors between named points, solved with
+nodal analysis).
 
 ### Resistor finder
 
@@ -114,8 +122,9 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
 - **Each tab has its own inputs**, so the multiple tab can default to 12 V while the single tab keeps 5 V.
   Both tabs run the same `calculate()`; the single tab is n_series = n_parallel = 1.
 - **Sliders go down to 0** as asked; at 0 the diagram shows "No LEDs" and the results ask for at least 1.
-- **Equivalent resistance as "series of parallel blocks"**: covers most real hobby networks with a simple UI.
-  Arbitrary nesting (parallel of series of parallel…) would need a tree editor; not worth it yet.
+- **Equivalent resistance as a tree** (2026-11-22, replacing the first "series of parallel blocks" model, which
+  couldn't do e.g. (220 + 220) ∥ 470). Nested boxes were chosen over a typed expression like
+  `100 + (220 || 220)`; the summary line shows the expression form read-only. Bridges are out of scope (see above).
 - **Values typed as text** (not number boxes) so `4k7` and `2.2k` work the way they're printed on parts lists.
 - **Finder kept to one row** (user request, 2026-11-22): the first version had 4/5-band and tolerance choices and
   a band-by-band key; that was more than people need when hunting through a parts box. It now always shows the
@@ -159,13 +168,16 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
 - 2026-11-22 — Resistor identifier card on the finder tab: band dropdowns (4 or 5 bands) → value, tolerance, range.
 - 2026-11-22 — LED tabs: source / power / forward-voltage options aligned in three columns (preset | preset | Custom);
   Custom always in column 3, leaving a gap where a group has one preset. Phones: Custom on its own line.
+- 2026-11-22 — Equivalent resistance rebuilt as a tree: nested series/parallel groups to any depth,
+  recursive diagram, summary line, per-group working.
 
 ## To do / watch out for
 
 - The stepped lines sit outside the card, so they need the left gutter: 37px on desktop, 15px on phones. If the
   page's side padding shrinks, they'll be clipped.
 - The page title and subtitle still talk only about LEDs, but tabs 3 and 4 are general resistor tools.
-- Possible: E96 suggestions for 5-band, nested networks.
+- Possible: E96 suggestions for 5-band; a typed-expression input for the equivalent tab; bridge networks.
+- Very deep / wide networks make the diagram small on phones (it scales to fit the card).
 
 - Slider maxima (12 series, 10 parallel) are arbitrary; raise them in `index.html` if needed. Large arrays make the
   diagram small on phones.
