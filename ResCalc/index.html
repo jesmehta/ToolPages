@@ -256,23 +256,24 @@
     <!-- =================== Tab 3: Equivalent resistance =================== -->
     <div role="tabpanel" id="panel-equiv" aria-labelledby="tab-equiv" hidden>
       <section class="card">
-        <h2>Resistors</h2>
-        <p class="note">Everything in a group is connected either in <strong>series</strong> or in <strong>parallel</strong>
-          &mdash; switch it at the top of the group. Groups can hold resistors and other groups, to any depth.
-          Type values like <code>220</code>, <code>4.7k</code>, <code>4k7</code> or <code>1M</code>.</p>
-        <div id="e-tree" class="tree"></div>
-      </section>
-
-      <section class="card">
-        <h2>Circuit</h2>
+        <div class="net-toolbar">
+          <h2>Circuit</h2>
+          <span class="mode-toggle" id="e-mode" role="group" aria-label="Diagram mode">
+            <button type="button" data-mode="edit" aria-pressed="true">Edit</button>
+            <button type="button" data-mode="view" aria-pressed="false">View</button>
+          </span>
+        </div>
+        <p class="note net-help">Build the circuit on the diagram. Each resistor has <strong>+</strong> buttons: left and right
+          add a resistor in <strong>series</strong>, above and below add one in <strong>parallel</strong>.
+          Choose each value from its list; &times; removes a resistor.</p>
         <p class="net-summary" id="e-summary"></p>
-        <svg id="e-diagram" class="diagram" role="img" aria-label="Diagram of the resistor network"></svg>
+        <div class="net-scroll">
+          <div class="net-canvas" id="e-canvas"></div>
+        </div>
       </section>
 
       <section class="card">
         <h2>Results</h2>
-        <p id="e-error" class="error" hidden></p>
-
         <div id="e-results">
           <table class="calc" id="e-working"></table>
 

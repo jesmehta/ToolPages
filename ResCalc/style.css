@@ -236,34 +236,7 @@ footer { color: var(--muted); font-size: 0.9rem; }
   table.calc .value { white-space: normal; }
 }
 
-/* ---------- shared: buttons, text inputs ---------- */
-
-.btn {
-  font: inherit;
-  font-weight: 600;
-  padding: 6px 14px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--card);
-  color: var(--text);
-  cursor: pointer;
-}
-
-.btn.small { font-size: 0.85rem; padding: 3px 10px; }
-
-.btn-x {
-  font: inherit;
-  line-height: 1;
-  width: 24px; height: 24px;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-  font-size: 1.1rem;
-}
-
-.btn-x:hover { color: var(--accent); }
+/* ---------- shared: text inputs ---------- */
 
 .r-input {
   width: 84px;
@@ -277,57 +250,12 @@ footer { color: var(--muted); font-size: 0.9rem; }
 
 .r-input.invalid { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
 
-
 code { font-size: 0.9em; }
 
 /* ---------- tab 3: equivalent resistance ---------- */
 
-.tree { margin: 12px 0 4px; }
-
-/* A group box. Series and parallel get a different coloured left edge. */
-.grp {
-  border: 1px solid var(--border);
-  border-left-width: 4px;
-  border-radius: 8px;
-  padding: 8px 10px 10px;
-  flex: 1 1 100%;               /* nested groups take a full row inside their parent */
-}
-
-.grp-series   { border-left-color: var(--teal, #1f8a85); }
-.grp-parallel { border-left-color: var(--violet, #6c4ab6); }
-
-.grp-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.grp-name { font-weight: 600; min-width: 4.5em; }
-.grp-head .btn-x { margin-left: auto; }
-
-/* Series / Parallel switch */
-.seg { display: inline-flex; }
-
-.seg button {
-  font: inherit;
-  font-size: 0.82rem;
-  padding: 2px 10px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.seg button + button { border-left: none; }
-.seg button:first-child { border-radius: 6px 0 0 6px; }
-.seg button:last-child { border-radius: 0 6px 6px 0; }
-.seg button[aria-pressed="true"] { color: #fff; }
-.grp-series   > .grp-head .seg button[aria-pressed="true"] { background: var(--teal, #1f8a85); }
-.grp-parallel > .grp-head .seg button[aria-pressed="true"] { background: var(--violet, #6c4ab6); }
-
-.grp-items { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.grp-add { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+/* The diagram is the editor: an SVG of wires and resistors with HTML
+   buttons and dropdowns positioned on top (coordinates from script.js). */
 
 .net-summary {
   margin: 0 0 10px;
@@ -336,11 +264,55 @@ code { font-size: 0.9em; }
   overflow-wrap: anywhere;
 }
 
-@media (max-width: 520px) {
-  .grp { padding: 6px 6px 8px; }
+.net-scroll { overflow-x: auto; padding-bottom: 4px; }
+
+.net-canvas { position: relative; margin: 0 auto; }
+.net-canvas svg { position: absolute; inset: 0; }
+
+.net-add, .net-del, .net-value {
+  position: absolute;
+  transform: translate(-50%, -50%);
 }
 
-.r-item { display: inline-flex; align-items: center; gap: 2px; }
+.net-add {
+  width: 22px; height: 22px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--text);
+  font: 600 15px/1 system-ui, sans-serif;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.12s, background 0.12s;
+}
+
+.net-add:hover, .net-add:focus-visible { opacity: 1; background: var(--accent); color: #fff; }
+
+.net-del {
+  width: 18px; height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  font: 600 15px/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.net-del:hover { color: var(--accent); }
+
+.net-value {
+  width: 92px;
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 2px 4px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+}
 
 .choice-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 520px; margin: 0 auto; }
 
@@ -405,3 +377,35 @@ code { font-size: 0.9em; }
   .options.opt-grid { grid-template-columns: 90px auto; }
   .opt-grid .opt-custom { grid-column: 1 / -1; }
 }
+
+/* Edit | View toggle for the equivalent-resistance diagram */
+
+.net-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.net-toolbar h2 { margin-bottom: 0; }
+
+.mode-toggle { display: inline-flex; }
+
+.mode-toggle button {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 3px 14px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.mode-toggle button:first-child { border-radius: 6px 0 0 6px; }
+.mode-toggle button:last-child { border-radius: 0 6px 6px 0; border-left: none; }
+.mode-toggle button[aria-pressed="true"] { background: var(--text); color: var(--card); }
+
+.net-viewing .net-help { display: none; }
+.net-toolbar + .note, .net-toolbar + .net-summary { margin-top: 12px; }

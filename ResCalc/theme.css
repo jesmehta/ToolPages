@@ -396,18 +396,8 @@ footer {
   .cg-bands .bands, .cg-cur { font-size: 0.72rem; }
 }
 
-/* ---------- tabs 3 & 4: buttons, inputs, blocks, band list ---------- */
+/* ---------- tabs 3 & 4: inputs ---------- */
 
-.btn {
-  font-family: var(--font-display);
-  border: 2px solid var(--border);
-  border-radius: 3px;
-  background: var(--card);
-  transition: background 0.12s;
-}
-
-.btn:hover { background: var(--bg); }
-.btn:active { background: var(--mustard); color: #1b1a2e; }
 
 .r-input {
   border: 2px solid var(--border);
@@ -422,24 +412,11 @@ footer {
 
 code { font-family: var(--font-mono); font-size: 0.85em; }
 
-.grp {
-  border: 2px solid var(--border);
-  border-left-width: 5px;
-  border-radius: 3px;
-  background: var(--bg);
-}
-
-.grp-series   { border-left-color: var(--teal); }
-.grp-parallel { border-left-color: var(--violet); }
-.grp .grp { background: var(--card); }
-.grp .grp .grp { background: var(--bg); }
-
-.grp-name { font-family: var(--font-display); }
-.seg button { font-family: var(--font-display); font-weight: 600; border-width: 2px; }
-.seg button + button { border-left: none; }
-.seg button[aria-pressed="true"] { color: #fff; }
 .net-summary { font-family: var(--font-mono); font-size: 0.95rem; }
 
+.net-add { border-width: 2px; font-family: var(--font-display); font-weight: 800; }
+.net-value { border: 2px solid var(--border); border-radius: 3px; font-family: var(--font-mono); font-size: 0.8rem; }
+.net-value:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 /* ---------- resistor identifier ---------- */
 
@@ -447,3 +424,8 @@ code { font-family: var(--font-mono); font-size: 0.85em; }
 .id-band select { border: 2px solid var(--border); border-radius: 3px; font-family: var(--font-body); }
 .id-band select:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
 .id-result .cg-val { font-size: 1.7rem; }
+
+.mode-toggle button { font-family: var(--font-display); border-width: 2px; }
+.mode-toggle button:first-child { border-radius: 3px 0 0 3px; }
+.mode-toggle button:last-child { border-radius: 0 3px 3px 0; }
+.mode-toggle button[aria-pressed="true"] { background: var(--violet); color: var(--on-violet); }
