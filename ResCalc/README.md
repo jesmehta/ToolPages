@@ -147,13 +147,13 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
   4 (Resistor finder: value → 4/5-band colour code with a band-by-band key). Text value input with k/M/RKM parsing.
 - 2026-11-22 — Resistor finder simplified to one row: resistor needed | closest standard (E24) | colour bands.
   Removed band-count and tolerance options and the band key.
-- 2026-11-22 — Look finalised. Solid drop shadows replaced by stepped left-edge lines (5→1px, 6px gaps; 3→1px on
+- 2026-11-22 — Look finalised. Solid drop shadows replaced by stepped left-edge lines (5→1px, 4px apart; 3→1px on
   phones); tabs are rounded rectangles with a 6px gap (not pills), no rule under them. Theme trial closed: postmodern kept as `theme.css`, the notebook /
   datasheet / memphis themes and the picker removed (they're in git history, commits 7928cd7, f00a7fe, 262ddeb).
 
 ## To do / watch out for
 
-- The stepped lines sit outside the card, so they need the left gutter: 45px on desktop, 15px on phones. If the
+- The stepped lines sit outside the card, so they need the left gutter: 37px on desktop, 15px on phones. If the
   page's side padding shrinks, they'll be clipped.
 - The page title and subtitle still talk only about LEDs, but tabs 3 and 4 are general resistor tools.
 - Possible: a reverse finder (pick colours → value), E96 suggestions for 5-band, nested networks.
