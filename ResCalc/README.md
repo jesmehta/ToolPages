@@ -18,7 +18,7 @@ The page has four tabs; each can be opened directly with a hash:
 1. **Single LED** (`index.html`) — one LED and one resistor.
 2. **Multiple LEDs** (`#multi`) — an array of LED strings.
 3. **Equivalent resistance** (`#equiv`) — combine resistors in series and parallel.
-4. **Resistor finder** (`#finder`) — type a value, see the colour bands to look for.
+4. **Resistor finder** (`#finder`) — type a value, see the colour bands to look for; or pick colours to identify a resistor.
 
 ### Single LED
 
@@ -91,6 +91,12 @@ Results show the working per block, the total, and the closest E24 value with it
 One row, three columns: **Resistor needed** (type a value) → **Closest standard** (E24) → **Look for**
 (4-band ±5% colour drawing plus band names). Under the input it says when the value is already a standard one.
 
+**Resistor identifier** (second card, the reverse direction): choose 4-band or 5-band, then a dropdown per band
+(digits, multiplier incl. gold ×0.1 / silver ×0.01, tolerance brown 1% … silver 10%). Each closed dropdown takes
+its band's colour so the row reads like the part. Shows the drawing, value ± tolerance and the min–max range
+(4-band: also whether it's an E24 value). Defaults: 4-band Yellow–Violet–Red–Gold (4.7 kΩ ±5%), 5-band
+Yellow–Violet–Black–Brown–Brown (4.70 kΩ ±1%).
+
 **Value input** (tabs 3 and 4): `220`, `4.7k`, `4k7`, `4R7`, `1M`, `2.2 kΩ`, `470 ohm`. `m`/`M` both mean mega.
 Bad values get a red outline; the equivalent tab shows an error, the finder shows "Not understood".
 
@@ -150,13 +156,14 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
 - 2026-11-22 — Look finalised. Solid drop shadows replaced by stepped left-edge lines (5→1px, 4px apart; 3→1px on
   phones); tabs are rounded rectangles with a 6px gap (not pills), no rule under them. Theme trial closed: postmodern kept as `theme.css`, the notebook /
   datasheet / memphis themes and the picker removed (they're in git history, commits 7928cd7, f00a7fe, 262ddeb).
+- 2026-11-22 — Resistor identifier card on the finder tab: band dropdowns (4 or 5 bands) → value, tolerance, range.
 
 ## To do / watch out for
 
 - The stepped lines sit outside the card, so they need the left gutter: 37px on desktop, 15px on phones. If the
   page's side padding shrinks, they'll be clipped.
 - The page title and subtitle still talk only about LEDs, but tabs 3 and 4 are general resistor tools.
-- Possible: a reverse finder (pick colours → value), E96 suggestions for 5-band, nested networks.
+- Possible: E96 suggestions for 5-band, nested networks.
 
 - Slider maxima (12 series, 10 parallel) are arbitrary; raise them in `index.html` if needed. Large arrays make the
   diagram small on phones.
