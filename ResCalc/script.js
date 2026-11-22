@@ -381,6 +381,29 @@ function addResistor(id, dir) {
   }
 }
 
+// The resistors whose outer series + would duplicate the + beside A / B:
+// the first / last item of the whole circuit, when that item is a single resistor.
+function edgeResistors() {
+  if (!isGroup(equivRoot)) return { first: equivRoot, last: equivRoot };
+  if (equivRoot.type !== "series") return { first: null, last: null };
+  const kids = equivRoot.children, a = kids[0], b = kids[kids.length - 1];
+  return { first: isGroup(a) ? null : a, last: isGroup(b) ? null : b };
+}
+
+// + beside A (end = "start") or B (end = "end"): a resistor in series with the
+// whole circuit, copying the value of the nearest resistor.
+function addAtEnd(end) {
+  const leaves = [];
+  const collect = n => (isGroup(n) ? n.children.forEach(collect) : leaves.push(n));
+  collect(equivRoot);
+  const fresh = R((end === "start" ? leaves[0] : leaves[leaves.length - 1]).v);
+  if (isGroup(equivRoot) && equivRoot.type === "series") {
+    if (end === "start") equivRoot.children.unshift(fresh); else equivRoot.children.push(fresh);
+  } else {
+    equivRoot = G("series", end === "start" ? [fresh, equivRoot] : [equivRoot, fresh]);
+  }
+}
+
 function deleteResistor(id) {
   const { node, parent } = findNode(id);
   if (!parent) return;                          // never delete the last resistor
@@ -476,13 +499,16 @@ function layout(n, x, top, parent = null) {
     // (parallel) + already adds at this exact spot, so don't show a second one.
     const i = parent ? parent.children.indexOf(n) : -1;
     const prevIsResistor = i > 0 && !isGroup(parent.children[i - 1]);
-    const showLeft = !(prevIsResistor && parent.type === "series");
+    // The + beside A / B already adds at the very start / end of the circuit.
+    const edge = edgeResistors();
+    const showLeft = !(prevIsResistor && parent.type === "series") && n !== edge.first;
+    const showRight = n !== edge.last;
     const showAbove = !(prevIsResistor && parent.type === "parallel");
     return {
       svg: wire(x, y, x + m.w, y) + smallResistorSvg(cx, y, colourBands(n.v), null),
       html:
         (showLeft ? plus("left", x + 16, y, "Add a resistor in series (before)") : "") +
-        plus("right", x + m.w - 16, y, "Add a resistor in series (after)") +
+        (showRight ? plus("right", x + m.w - 16, y, "Add a resistor in series (after)") : "") +
         (showAbove ? plus("above", cx, y - 34, "Add a resistor in parallel (above)") : "") +
         plus("below", cx, y + 58, "Add a resistor in parallel (below)") +
         (n === equivRoot ? "" :
@@ -524,25 +550,34 @@ function layout(n, x, top, parent = null) {
 }
 
 function renderNetwork() {
-  const PAD = 34;
+  const editing = equivMode === "edit";
+  const PAD = editing ? 62 : 34;                 // edit mode leaves room for the + beside A and B
   const m = measure(equivRoot);
   const W = m.w + 2 * PAD, H = m.h + 6;
   const y = m.up + 3;
+  const xA = 16, xB = W - 16;
   const { svg, html } = layout(equivRoot, PAD, 3);
 
   const term = (cx, label) =>
     `<circle cx="${cx}" cy="${y}" r="5" fill="var(--card, #fff)" stroke="var(--wire)" stroke-width="2.5"/>` +
     `<text x="${cx}" y="${y - 12}" class="dg-label" text-anchor="middle">${label}</text>`;
   const stubs =
-    `<line x1="${PAD - 13}" y1="${y}" x2="${PAD}" y2="${y}" stroke="var(--wire)" stroke-width="2.5"/>` +
-    `<line x1="${PAD + m.w}" y1="${y}" x2="${PAD + m.w + 13}" y2="${y}" stroke="var(--wire)" stroke-width="2.5"/>`;
+    `<line x1="${xA + 5}" y1="${y}" x2="${PAD}" y2="${y}" stroke="var(--wire)" stroke-width="2.5"/>` +
+    `<line x1="${PAD + m.w}" y1="${y}" x2="${xB - 5}" y2="${y}" stroke="var(--wire)" stroke-width="2.5"/>`;
+  const endPlus = (end, px, title) =>
+    `<button type="button" class="net-add net-add-${end}" data-act="add-end" data-end="${end}"
+             style="left:${px}px;top:${y}px" title="${title}" aria-label="${title}">+</button>`;
 
   const canvas = $("e-canvas");
   canvas.style.width = `${W}px`;
   canvas.style.height = `${H}px`;
   canvas.innerHTML =
     `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">${stubs}${svg}` +
-    `${term(PAD - 18, "A")}${term(PAD + m.w + 18, "B")}</svg>` + html;
+    `${term(xA, "A")}${term(xB, "B")}</svg>` + html +
+    (editing
+      ? endPlus("start", xA + 24, "Add a resistor in series at the start (after A)") +
+        endPlus("end", xB - 24, "Add a resistor in series at the end (before B)")
+      : "");
 }
 
 // ---------- results ----------
@@ -586,6 +621,7 @@ $("e-canvas").addEventListener("click", e => {
   const id = +btn.dataset.id;
   if (btn.dataset.act === "add") addResistor(id, btn.dataset.dir);
   if (btn.dataset.act === "del") deleteResistor(id);
+  if (btn.dataset.act === "add-end") addAtEnd(btn.dataset.end);
   updateEquiv();
 });
 

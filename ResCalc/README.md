@@ -83,6 +83,9 @@ supply 312.5 mA / 3.75 W, 80% efficiency.
 - a **dropdown** of standard E24 values (1 Ω … 10 MΩ, grouped by decade),
 - **×** to remove it (not shown on the last remaining resistor).
 
+Terminal **A** has a **+** on its right and **B** one on its left: they add a resistor in series at the very
+start / end of the whole circuit (also when the outermost connection is parallel).
+
 A new resistor starts with the value of the one whose + was clicked (so 220 ∥ 220 is one click). Where two
 neighbouring + buttons would do exactly the same thing, only one is shown. Growing one resistor at a time like
 this can build **any** series/parallel network, e.g. (R1 + R2) ∥ R3: start with R1, + below for R3, + right of R1
@@ -178,6 +181,7 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
   recursive diagram, summary line, per-group working.
 - 2026-11-22 — Equivalent resistance: the diagram is now the editor (+ buttons for series/parallel, value
   dropdown, ×), replacing the nested boxes. Edit | View toggle for a clean diagram.
+- 2026-11-22 — + beside terminals A and B: add a resistor in series at the start / end of the circuit.
 
 ## To do / watch out for
 
