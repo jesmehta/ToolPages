@@ -422,14 +422,23 @@ footer {
 
 code { font-family: var(--font-mono); font-size: 0.85em; }
 
-.block {
-  border: 2px dashed var(--border);
+.grp {
+  border: 2px solid var(--border);
+  border-left-width: 5px;
   border-radius: 3px;
   background: var(--bg);
 }
 
-.block-head { font-family: var(--font-display); }
-.block-head em { font-family: var(--font-serif); font-size: 1.05em; }
+.grp-series   { border-left-color: var(--teal); }
+.grp-parallel { border-left-color: var(--violet); }
+.grp .grp { background: var(--card); }
+.grp .grp .grp { background: var(--bg); }
+
+.grp-name { font-family: var(--font-display); }
+.seg button { font-family: var(--font-display); font-weight: 600; border-width: 2px; }
+.seg button + button { border-left: none; }
+.seg button[aria-pressed="true"] { color: #fff; }
+.net-summary { font-family: var(--font-mono); font-size: 0.95rem; }
 
 
 /* ---------- resistor identifier ---------- */

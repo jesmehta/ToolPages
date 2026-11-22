@@ -318,38 +318,104 @@ function updateMulti() {
 
 // ---------- tab 3: equivalent resistance ----------
 //
-// Model: a list of blocks joined in series; each block holds one or more
-// resistors in parallel. Values are kept as the text the user typed.
+// Model: a tree. A node is either
+//   { id, type: "r", text }                          a resistor (text as typed)
+//   { id, type: "series" | "parallel", children }    a group
+// Groups nest to any depth, so any series/parallel network can be built.
+// (Bridge circuits, e.g. a Wheatstone bridge, are not series/parallel and can't.)
 
-let equivBlocks = [["100"], ["220", "220"]];
+let nextNodeId = 1;
+const R = text => ({ id: nextNodeId++, type: "r", text });
+const G = (type, children) => ({ id: nextNodeId++, type, children });
 
-function parallelOf(rs) {
-  return 1 / rs.reduce((sum, r) => sum + 1 / r, 0);
+// Default: 100 + (220 ∥ 220) = 210 Ω
+let equivRoot = G("series", [R("100"), G("parallel", [R("220"), R("220")])]);
+
+const isGroup = n => n.type !== "r";
+const other = type => (type === "series" ? "parallel" : "series");
+const SYMBOL = { series: "+", parallel: "∥" };
+
+function findNode(id, node = equivRoot, parent = null) {
+  if (node.id === id) return { node, parent };
+  if (!isGroup(node)) return null;
+  for (const c of node.children) {
+    const hit = findNode(id, c, node);
+    if (hit) return hit;
+  }
+  return null;
 }
+
+// Group labels by position: the root is "Network", its groups G1, G2, theirs G1.1, G1.2 ...
+function labelGroups(node = equivRoot, prefix = "", out = new Map()) {
+  out.set(node.id, prefix ? `G${prefix}` : "Network");
+  let k = 0;
+  node.children.forEach(c => {
+    if (isGroup(c)) { k += 1; labelGroups(c, prefix ? `${prefix}.${k}` : `${k}`, out); }
+  });
+  return out;
+}
+
+// Resistance of a node, or NaN if any value inside is not understood.
+function nodeValue(n) {
+  if (!isGroup(n)) { const r = parseOhms(n.text); return r > 0 ? r : NaN; }
+  const vs = n.children.map(nodeValue);
+  return n.type === "series"
+    ? vs.reduce((a, b) => a + b, 0)
+    : 1 / vs.reduce((a, b) => a + 1 / b, 0);
+}
+
+// One-line summary, e.g. "100 Ω + (220 Ω ∥ 220 Ω)". Nested groups are bracketed.
+function summaryOf(n, nested = false) {
+  if (!isGroup(n)) { const r = parseOhms(n.text); return r > 0 ? fmtOhms(r) : "?"; }
+  if (n.children.length === 1) return summaryOf(n.children[0], nested);
+  const inner = n.children.map(c => summaryOf(c, true)).join(` ${SYMBOL[n.type]} `);
+  return nested ? `(${inner})` : inner;
+}
+
+// ---------- inputs: nested group boxes ----------
 
 function renderEquivInputs() {
-  const host = $("e-blocks");
-  host.innerHTML = equivBlocks.map((block, b) => `
-    <div class="block">
-      <div class="block-head">
-        <span>Block ${b + 1}${block.length > 1 ? " <em>(parallel)</em>" : ""}</span>
-        ${equivBlocks.length > 1
-          ? `<button type="button" class="btn-x" data-action="del-block" data-b="${b}" aria-label="Remove block ${b + 1}">×</button>`
-          : ""}
-      </div>
-      <div class="block-items">
-        ${block.map((v, i) => `
-          <span class="r-item">
-            <input type="text" class="r-input" value="${v.replace(/"/g, "&quot;")}" data-b="${b}" data-i="${i}"
-                   autocomplete="off" spellcheck="false" aria-label="Block ${b + 1} resistor ${i + 1}">
-            ${block.length > 1
-              ? `<button type="button" class="btn-x" data-action="del-r" data-b="${b}" data-i="${i}" aria-label="Remove resistor">×</button>`
-              : ""}
-          </span>`).join("")}
-        <button type="button" class="btn small" data-action="add-r" data-b="${b}">+ parallel</button>
-      </div>
-    </div>`).join("");
+  const labels = labelGroups();
+
+  const renderNode = (n, parent) => {
+    if (!isGroup(n)) {
+      return `
+        <span class="r-item">
+          <input type="text" class="r-input" value="${n.text.replace(/"/g, "&quot;")}" data-id="${n.id}"
+                 autocomplete="off" spellcheck="false" aria-label="Resistor value">
+          ${parent.children.length > 1
+            ? `<button type="button" class="btn-x" data-action="del" data-id="${n.id}" aria-label="Remove resistor">×</button>`
+            : ""}
+        </span>`;
+    }
+    const isRoot = n === equivRoot;
+    return `
+      <div class="grp grp-${n.type}">
+        <div class="grp-head">
+          <span class="grp-name">${labels.get(n.id)}</span>
+          <span class="seg" role="group" aria-label="Connection">
+            ${["series", "parallel"].map(t => `
+              <button type="button" data-action="type" data-type="${t}" data-id="${n.id}"
+                      aria-pressed="${n.type === t}">${t === "series" ? "Series" : "Parallel"}</button>`).join("")}
+          </span>
+          ${!isRoot && parent.children.length > 1
+            ? `<button type="button" class="btn-x" data-action="del" data-id="${n.id}" aria-label="Remove group">×</button>`
+            : ""}
+        </div>
+        <div class="grp-items">
+          ${n.children.map(c => renderNode(c, n)).join("")}
+        </div>
+        <div class="grp-add">
+          <button type="button" class="btn small" data-action="add-r" data-id="${n.id}">+ resistor</button>
+          <button type="button" class="btn small" data-action="add-g" data-id="${n.id}">+ ${other(n.type)} group</button>
+        </div>
+      </div>`;
+  };
+
+  $("e-tree").innerHTML = renderNode(equivRoot, null);
 }
+
+// ---------- diagram: recursive layout ----------
 
 // Resistor symbol at (cx, y) with optional colour bands, plus a value label beneath.
 function smallResistorSvg(cx, y, bands, label) {
@@ -364,67 +430,93 @@ function smallResistorSvg(cx, y, bands, label) {
   return s;
 }
 
-function drawNetwork(svgId, blocks) {
-  const svg = $(svgId);
-  const BLOCK_W = 110, ROW = 50, PAD = 26;
-  const maxN = Math.max(...blocks.map(b => b.length));
-  const H = maxN * ROW + 34;
-  const midY = H / 2 - 4;
-  const W = PAD * 2 + blocks.length * BLOCK_W;
-  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-  svg.style.maxWidth = `${Math.max(W * 1.3, 320)}px`;
 
-  const wire = `stroke="var(--wire)" stroke-width="2.5" fill="none"`;
-  const dot = (x, y) => `<circle cx="${x}" cy="${y}" r="3.5" fill="var(--wire)"/>`;
-  let s = "";
+const NET = { RW: 84, RH: 52, RAIL: 14 };   // resistor cell size; parallel rail inset
 
-  // terminals
-  s += `<circle cx="${PAD - 10}" cy="${midY}" r="5" fill="var(--card, #fff)" stroke="var(--wire)" stroke-width="2.5"/>`;
-  s += `<text x="${PAD - 10}" y="${midY - 12}" class="dg-label" text-anchor="middle">A</text>`;
-  s += `<line x1="${PAD - 5}" y1="${midY}" x2="${PAD}" y2="${midY}" ${wire}/>`;
-
-  blocks.forEach((rs, b) => {
-    const xl = PAD + b * BLOCK_W, xr = xl + BLOCK_W, cx = (xl + xr) / 2;
-    const label = r => (r > 0 ? fmtOhms(r) : "?");
-    const bandsOf = r => (r > 0 ? colourBands(r) : null);
-    if (rs.length === 1) {
-      s += `<line x1="${xl}" y1="${midY}" x2="${xr}" y2="${midY}" ${wire}/>`;
-      s += smallResistorSvg(cx, midY, bandsOf(rs[0]), label(rs[0]));
-      return;
-    }
-    const ys = rs.map((_, k) => midY + (k - (rs.length - 1) / 2) * ROW);
-    const xa = xl + 10, xb = xr - 10;
-    s += `<line x1="${xl}" y1="${midY}" x2="${xa}" y2="${midY}" ${wire}/>`;
-    s += `<line x1="${xb}" y1="${midY}" x2="${xr}" y2="${midY}" ${wire}/>`;
-    s += `<line x1="${xa}" y1="${ys[0]}" x2="${xa}" y2="${ys[ys.length - 1]}" ${wire}/>`;
-    s += `<line x1="${xb}" y1="${ys[0]}" x2="${xb}" y2="${ys[ys.length - 1]}" ${wire}/>`;
-    s += dot(xa, midY) + dot(xb, midY);
-    rs.forEach((r, k) => {
-      s += `<line x1="${xa}" y1="${ys[k]}" x2="${xb}" y2="${ys[k]}" ${wire}/>`;
-      s += smallResistorSvg(cx, ys[k], bandsOf(r), label(r));
-    });
-  });
-
-  const xEnd = PAD + blocks.length * BLOCK_W;
-  s += `<line x1="${xEnd}" y1="${midY}" x2="${xEnd + 5}" y2="${midY}" ${wire}/>`;
-  s += `<circle cx="${xEnd + 10}" cy="${midY}" r="5" fill="var(--card, #fff)" stroke="var(--wire)" stroke-width="2.5"/>`;
-  s += `<text x="${xEnd + 10}" y="${midY - 12}" class="dg-label" text-anchor="middle">B</text>`;
-  svg.innerHTML = s;
+// Size of a node's drawing: series lays children side by side, parallel stacks them.
+function measure(n) {
+  if (!isGroup(n)) return { w: NET.RW, h: NET.RH };
+  if (n.children.length === 1) return measure(n.children[0]);
+  const sizes = n.children.map(measure);
+  if (n.type === "series") {
+    return { w: sizes.reduce((a, s) => a + s.w, 0), h: Math.max(...sizes.map(s => s.h)) };
+  }
+  return { w: Math.max(...sizes.map(s => s.w)) + 2 * NET.RAIL, h: sizes.reduce((a, s) => a + s.h, 0) };
 }
 
-function updateEquiv() {
-  const values = equivBlocks.map(block => block.map(parseOhms));
+// Draws node n in a box starting at x, with the wire entering at (x, y) and
+// leaving at (x + width, y).
+function drawNode(n, x, y) {
+  const wire = (x1, y1, x2, y2) =>
+    `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--wire)" stroke-width="2.5"/>`;
+  const dot = (cx, cy) => `<circle cx="${cx}" cy="${cy}" r="3.5" fill="var(--wire)"/>`;
+  const { w } = measure(n);
 
+  if (!isGroup(n)) {
+    const r = parseOhms(n.text);
+    return wire(x, y, x + w, y) +
+      smallResistorSvg(x + w / 2, y, r > 0 ? colourBands(r) : null, r > 0 ? fmtOhms(r) : "?");
+  }
+  if (n.children.length === 1) return drawNode(n.children[0], x, y);
+
+  let s = "";
+  if (n.type === "series") {
+    let cx = x;
+    n.children.forEach(c => { s += drawNode(c, cx, y); cx += measure(c).w; });
+    return s;
+  }
+
+  // parallel: rails at both ends, children stacked and centred on y
+  const sizes = n.children.map(measure);
+  const total = sizes.reduce((a, sz) => a + sz.h, 0);
+  const xl = x + NET.RAIL / 2, xr = x + w - NET.RAIL / 2;
+  let top = y - total / 2;
+  const ys = sizes.map(sz => { const cy = top + sz.h / 2; top += sz.h; return cy; });
+
+  s += wire(x, y, xl, y) + wire(xr, y, x + w, y);
+  s += wire(xl, ys[0], xl, ys[ys.length - 1]) + wire(xr, ys[0], xr, ys[ys.length - 1]);
+  n.children.forEach((c, k) => {
+    const cw = sizes[k].w, cx = x + NET.RAIL;
+    s += wire(xl, ys[k], cx, ys[k]);
+    s += drawNode(c, cx, ys[k]);
+    s += wire(cx + cw, ys[k], xr, ys[k]);           // stretch shorter branches to the rail
+  });
+  s += dot(xl, y) + dot(xr, y);
+  return s;
+}
+
+function drawNetwork(svgId) {
+  const svg = $(svgId);
+  const PAD = 30, TOP = 14;
+  const size = measure(equivRoot);
+  const W = size.w + 2 * PAD, H = size.h + TOP + 6;
+  const y = TOP + size.h / 2;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.style.maxWidth = `${Math.max(W * 1.2, 320)}px`;
+
+  const term = (cx, label) =>
+    `<circle cx="${cx}" cy="${y}" r="5" fill="var(--card, #fff)" stroke="var(--wire)" stroke-width="2.5"/>` +
+    `<text x="${cx}" y="${y - 12}" class="dg-label" text-anchor="middle">${label}</text>`;
+
+  svg.innerHTML =
+    `<line x1="${PAD - 10}" y1="${y}" x2="${PAD}" y2="${y}" stroke="var(--wire)" stroke-width="2.5"/>` +
+    `<line x1="${PAD + size.w}" y1="${y}" x2="${PAD + size.w + 10}" y2="${y}" stroke="var(--wire)" stroke-width="2.5"/>` +
+    drawNode(equivRoot, PAD, y) + term(PAD - 12, "A") + term(PAD + size.w + 12, "B");
+}
+
+// ---------- results ----------
+
+function updateEquiv() {
   // mark bad inputs
   let bad = 0;
-  document.querySelectorAll("#e-blocks .r-input").forEach(el => {
-    const r = values[el.dataset.b][el.dataset.i];
-    const ok = r > 0;
+  document.querySelectorAll("#e-tree .r-input").forEach(el => {
+    const ok = parseOhms(el.value) > 0;
     el.classList.toggle("invalid", !ok);
     if (!ok) bad++;
   });
 
-  drawNetwork("e-diagram", values);
+  setText("e-summary", `A ── ${summaryOf(equivRoot)} ── B`);
+  drawNetwork("e-diagram");
 
   const err = $("e-error"), results = $("e-results");
   if (bad) {
@@ -436,25 +528,28 @@ function updateEquiv() {
   err.hidden = true;
   results.hidden = false;
 
-  const blockR = values.map(rs => (rs.length === 1 ? rs[0] : parallelOf(rs)));
-  const total = blockR.reduce((a, b) => a + b, 0);
+  // Working, innermost groups first (post-order), one row per group with 2+ items.
+  const labels = labelGroups();
+  const rows = [];
+  const walk = n => {
+    if (!isGroup(n)) return;
+    n.children.forEach(walk);
+    if (n.children.length < 2) return;
+    const parts = n.children.map(c => (isGroup(c) && c.children.length > 1 ? labels.get(c.id) : fmtOhms(nodeValue(c))));
+    const formula = n.type === "series"
+      ? parts.join(" + ")
+      : "1 / (" + parts.map(p => "1/" + p).join(" + ") + ")";
+    rows.push(`
+      <tr>
+        <th>${labels.get(n.id)} <span class="note">(${n.type})</span></th>
+        <td class="formula">${formula}</td>
+        <td class="value">${fmtOhms(nodeValue(n))}</td>
+      </tr>`);
+  };
+  walk(equivRoot);
+  $("e-working").innerHTML = rows.join("");
 
-  let rows = values.map((rs, b) => `
-    <tr>
-      <th>Block ${b + 1}${rs.length > 1 ? " (parallel)" : ""}</th>
-      <td class="formula">${rs.length > 1 ? "1 / (" + rs.map(r => "1/" + fmtOhms(r)).join(" + ") + ")" : "single resistor"}</td>
-      <td class="value">${fmtOhms(blockR[b])}</td>
-    </tr>`).join("");
-  if (values.length > 1) {
-    rows += `
-    <tr>
-      <th>Blocks in series</th>
-      <td class="formula">${blockR.map(fmtOhms).join(" + ")}</td>
-      <td class="value">${fmtOhms(total)}</td>
-    </tr>`;
-  }
-  $("e-working").innerHTML = rows;
-
+  const total = nodeValue(equivRoot);
   setText("e-out-total", fmtOhms(total));
   const closest = closestStandard(total);
   const bands = colourBands(closest);
@@ -463,35 +558,47 @@ function updateEquiv() {
   setText("e-bands-closest", bandNames(bands));
 }
 
-$("e-blocks").addEventListener("input", e => {
+// ---------- events ----------
+
+$("e-tree").addEventListener("input", e => {
   const el = e.target;
   if (!el.classList.contains("r-input")) return;
-  equivBlocks[el.dataset.b][el.dataset.i] = el.value;
+  findNode(+el.dataset.id).node.text = el.value;
   updateEquiv();
 });
 
-$("e-blocks").addEventListener("click", e => {
+$("e-tree").addEventListener("click", e => {
   const btn = e.target.closest("button[data-action]");
   if (!btn) return;
-  const b = +btn.dataset.b, i = +btn.dataset.i;
-  if (btn.dataset.action === "add-r") equivBlocks[b].push(equivBlocks[b][equivBlocks[b].length - 1]);
-  if (btn.dataset.action === "del-r") equivBlocks[b].splice(i, 1);
-  if (btn.dataset.action === "del-block") equivBlocks.splice(b, 1);
-  renderEquivInputs();
-  updateEquiv();
-  // put the cursor in the resistor that was just added
-  if (btn.dataset.action === "add-r") {
-    const inputs = document.querySelectorAll(`#e-blocks .r-input[data-b="${b}"]`);
-    inputs[inputs.length - 1].select();
-  }
-});
+  const { node, parent } = findNode(+btn.dataset.id);
+  let focusId = null;
 
-$("e-add-block").addEventListener("click", () => {
-  equivBlocks.push(["100"]);
+  switch (btn.dataset.action) {
+    case "type":
+      node.type = btn.dataset.type;
+      break;
+    case "add-r": {
+      const last = [...node.children].reverse().find(c => !isGroup(c));
+      const r = R(last ? last.text : "100");
+      node.children.push(r);
+      focusId = r.id;
+      break;
+    }
+    case "add-g": {
+      // a new group of the other kind, with two resistors to start from
+      const g = G(other(node.type), [R("100"), R("100")]);
+      node.children.push(g);
+      focusId = g.children[0].id;
+      break;
+    }
+    case "del":
+      parent.children.splice(parent.children.indexOf(node), 1);
+      break;
+  }
+
   renderEquivInputs();
   updateEquiv();
-  const inputs = document.querySelectorAll("#e-blocks .r-input");
-  inputs[inputs.length - 1].select();
+  if (focusId) document.querySelector(`#e-tree .r-input[data-id="${focusId}"]`)?.select();
 });
 
 // ---------- tab 4: resistor finder ----------

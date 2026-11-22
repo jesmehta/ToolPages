@@ -257,14 +257,15 @@
     <div role="tabpanel" id="panel-equiv" aria-labelledby="tab-equiv" hidden>
       <section class="card">
         <h2>Resistors</h2>
-        <p class="note">Resistors inside a block are in <strong>parallel</strong>; the blocks are joined in
-          <strong>series</strong>. Type values like <code>220</code>, <code>4.7k</code>, <code>4k7</code> or <code>1M</code>.</p>
-        <div id="e-blocks" class="blocks"></div>
-        <button type="button" class="btn" id="e-add-block">+ Add block in series</button>
+        <p class="note">Everything in a group is connected either in <strong>series</strong> or in <strong>parallel</strong>
+          &mdash; switch it at the top of the group. Groups can hold resistors and other groups, to any depth.
+          Type values like <code>220</code>, <code>4.7k</code>, <code>4k7</code> or <code>1M</code>.</p>
+        <div id="e-tree" class="tree"></div>
       </section>
 
       <section class="card">
         <h2>Circuit</h2>
+        <p class="net-summary" id="e-summary"></p>
         <svg id="e-diagram" class="diagram" role="img" aria-label="Diagram of the resistor network"></svg>
       </section>
 
