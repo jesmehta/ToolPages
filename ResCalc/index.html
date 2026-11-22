@@ -29,29 +29,29 @@
 
         <fieldset>
           <legend>Power source &nbsp;<span class="sym">V<sub>source</sub></span></legend>
-          <div class="options">
+          <div class="options opt-grid">
             <label><input type="radio" name="s-vsource" value="5" checked> USB 5 V</label>
             <label><input type="radio" name="s-vsource" value="12"> Wall adaptor 12 V</label>
-            <label><input type="radio" name="s-vsource" value="custom"> Custom
+            <label class="opt-custom"><input type="radio" name="s-vsource" value="custom"> Custom
               <input type="number" id="s-vsource-custom" step="any" min="0" placeholder="V" disabled></label>
           </div>
         </fieldset>
 
         <fieldset>
           <legend>LED power &nbsp;<span class="sym">P<sub>LED</sub></span></legend>
-          <div class="options">
+          <div class="options opt-grid">
             <label><input type="radio" name="s-power" value="1" checked> 1 W</label>
             <label><input type="radio" name="s-power" value="3"> 3 W</label>
-            <label><input type="radio" name="s-power" value="custom"> Custom
+            <label class="opt-custom"><input type="radio" name="s-power" value="custom"> Custom
               <input type="number" id="s-power-custom" step="any" min="0" placeholder="W" disabled></label>
           </div>
         </fieldset>
 
         <fieldset>
           <legend>LED forward voltage &nbsp;<span class="sym">V<sub>LED</sub></span></legend>
-          <div class="options">
+          <div class="options opt-grid">
             <label><input type="radio" name="s-vled" value="3.2" checked> 3.2 V</label>
-            <label><input type="radio" name="s-vled" value="custom"> Custom
+            <label class="opt-custom"><input type="radio" name="s-vled" value="custom"> Custom
               <input type="number" id="s-vled-custom" step="any" min="0" placeholder="V" disabled></label>
           </div>
         </fieldset>
@@ -141,29 +141,29 @@
 
         <fieldset>
           <legend>Power source &nbsp;<span class="sym">V<sub>source</sub></span></legend>
-          <div class="options">
+          <div class="options opt-grid">
             <label><input type="radio" name="m-vsource" value="5"> USB 5 V</label>
             <label><input type="radio" name="m-vsource" value="12" checked> Wall adaptor 12 V</label>
-            <label><input type="radio" name="m-vsource" value="custom"> Custom
+            <label class="opt-custom"><input type="radio" name="m-vsource" value="custom"> Custom
               <input type="number" id="m-vsource-custom" step="any" min="0" placeholder="V" disabled></label>
           </div>
         </fieldset>
 
         <fieldset>
           <legend>LED power (each) &nbsp;<span class="sym">P<sub>LED</sub></span></legend>
-          <div class="options">
+          <div class="options opt-grid">
             <label><input type="radio" name="m-power" value="1" checked> 1 W</label>
             <label><input type="radio" name="m-power" value="3"> 3 W</label>
-            <label><input type="radio" name="m-power" value="custom"> Custom
+            <label class="opt-custom"><input type="radio" name="m-power" value="custom"> Custom
               <input type="number" id="m-power-custom" step="any" min="0" placeholder="W" disabled></label>
           </div>
         </fieldset>
 
         <fieldset>
           <legend>LED forward voltage (each) &nbsp;<span class="sym">V<sub>LED</sub></span></legend>
-          <div class="options">
+          <div class="options opt-grid">
             <label><input type="radio" name="m-vled" value="3.2" checked> 3.2 V</label>
-            <label><input type="radio" name="m-vled" value="custom"> Custom
+            <label class="opt-custom"><input type="radio" name="m-vled" value="custom"> Custom
               <input type="number" id="m-vled-custom" step="any" min="0" placeholder="V" disabled></label>
           </div>
         </fieldset>

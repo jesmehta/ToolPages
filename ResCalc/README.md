@@ -157,6 +157,8 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
   phones); tabs are rounded rectangles with a 6px gap (not pills), no rule under them. Theme trial closed: postmodern kept as `theme.css`, the notebook /
   datasheet / memphis themes and the picker removed (they're in git history, commits 7928cd7, f00a7fe, 262ddeb).
 - 2026-11-22 — Resistor identifier card on the finder tab: band dropdowns (4 or 5 bands) → value, tolerance, range.
+- 2026-11-22 — LED tabs: source / power / forward-voltage options aligned in three columns (preset | preset | Custom);
+  Custom always in column 3, leaving a gap where a group has one preset. Phones: Custom on its own line.
 
 ## To do / watch out for
 
