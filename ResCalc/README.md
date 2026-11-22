@@ -236,7 +236,8 @@ A stage-by-stage visual version, with screenshots, is in [CHANGELOG.md](CHANGELO
 - **Link previews:** the `og:` URLs are absolute and point at the Cabinet, so they only work once Cabinet
   publishes `og-preview.jpg` (it is in the allowlist). If the title or look changes, re-run
   `dev-tools/make-og-preview.js` and keep the image under ~300 KB (WhatsApp drops larger ones). WhatsApp caches
-  previews per URL; test with `?v=2` etc.
+  previews per URL; test with `?v=2` etc., from WhatsApp on a phone (WhatsApp Web doesn't build
+  previews; a preview made on the phone does show on desktop).
 - When a change is visible, add a stage to `CHANGELOG.md` with a screenshot in `dev-screenshots/`.
 - The page title and subtitle still talk only about LEDs, but tabs 3 and 4 are general resistor tools.
 - Possible: E96 suggestions for 5-band; a typed-expression input for the equivalent tab; bridge networks.
