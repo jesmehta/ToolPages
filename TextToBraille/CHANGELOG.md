@@ -47,3 +47,11 @@ of once. Link-preview image added.
 | Link preview (`og-preview.jpg`) |
 | --- |
 | ![Link preview](og-preview.jpg) |
+
+## 5. Mushroom-pop title dots — 2026-11-22
+
+The title's braille dots pop up like cartoon mushrooms: they grow past full size (1.4×), plop back a
+touch under (0.9×) and settle; on the way down they puff up (1.25×) and shrink away to nothing. Frozen
+mid-wave below: settled dots on the left, overshooting ones in the middle, some still emerging.
+
+![Title dots mid-pop](dev-screenshots/05-title-mushroom-pop.jpg)

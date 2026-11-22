@@ -93,7 +93,9 @@ straight to a machine.
      walls terrazzo, concrete, stronger brushed metal. **Signal orange + concrete** chosen.
   The other themes, tiles and the picker were deleted before the first commit; screenshots are in CHANGELOG.md.
 - **Title animation repeats**: the title's braille dots press up one by one, hold, sink back in the same order,
-  every 8 s (user request: periodically, not only once). One infinite CSS animation per dot, offset by its
+  every 8 s (user request: periodically, not only once). Each pop is cartoon-mushroom style (user request):
+  up — grow past full size to 1.4×, plop to 0.9×, settle at 1×; down — puff up to 1.25×, then shrink to
+  nothing while fading. Keyframes `dot-cycle` in `style.css`. One infinite CSS animation per dot, offset by its
   index, so the stagger holds on every cycle. With reduced motion turned on, the dots just stay up.
 
 ## Files
@@ -128,6 +130,8 @@ Stage-by-stage with screenshots: [CHANGELOG.md](CHANGELOG.md).
   preview image `og-preview.jpg`.
 - 2026-11-22 — Title braille: every position has its empty circle under the raised dot, so the cell outline
   stays visible while the dots are sunk.
+- 2026-11-22 — Title dots pop like cartoon mushrooms: overshoot and plop back on the way up, puff up then
+  shrink away on the way down.
 
 ## To do / watch out for
 

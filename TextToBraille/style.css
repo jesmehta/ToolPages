@@ -65,11 +65,18 @@ header { text-align: center; margin: 4px auto 28px; max-width: 760px; }
   animation: dot-cycle 8s infinite backwards;
   animation-delay: calc(var(--i) * 45ms + 150ms);
 }
+/* Cartoon-mushroom pops (8 s cycle; 1% = 80 ms):
+   up:   grow from nothing past full size (1.4×), plop back a touch under (0.9×), settle at 1×
+   hold
+   down: puff up a little (1.25×), then shrink all the way to nothing, fading as it goes */
 @keyframes dot-cycle {
-  0%       { transform: scale(0); opacity: 0; animation-timing-function: cubic-bezier(0.3, 1.6, 0.5, 1); }
-  5%       { transform: scale(1); opacity: 1; }
-  70%      { transform: scale(1); opacity: 1; animation-timing-function: ease-in; }
-  76%, 100% { transform: scale(0); opacity: 0; }
+  0%        { transform: scale(0);    opacity: 0; animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+  3.5%      { transform: scale(1.4);  opacity: 1; animation-timing-function: ease-in-out; }
+  5.5%      { transform: scale(0.9);  animation-timing-function: ease-out; }
+  7%        { transform: scale(1); }
+  68%       { transform: scale(1);    opacity: 1; animation-timing-function: ease-out; }
+  70.5%     { transform: scale(1.25); opacity: 1; animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.4); }
+  74%, 100% { transform: scale(0);    opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .hero-braille .on { animation: none; } }
 h1 {
