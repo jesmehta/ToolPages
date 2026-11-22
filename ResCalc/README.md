@@ -160,13 +160,18 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
 - `style.css` — base layout and plain light/dark colours (the page still works with only this)
 - `theme.css` — the look, layered on top: Google Fonts (Bricolage Grotesque, Instrument Sans/Serif, IBM Plex Mono),
   midnight-blue background with the "Neon" colours (coral `#FF6B6B`, cyan `#4CC9F0`, amber `#FFC857`, lavender
-  `#B392F0`), light outlines, stepped accent lines left of each card, and the animated title circuit's styles.
+  `#B392F0`), light outlines, stepped accent lines on both sides of each card, the centred title, and the
+  animated title circuit's styles.
   The colour variables keep their original role names (`--accent`, `--teal`, `--mustard`, `--violet`).
 - `bg-symbols.svg` — faint (18% opacity) Memphis-style background tile of electrical symbols in the same four colours
 - `script.js` — LED calculation (shared by tabs 1–2), equivalent-resistance network, resistor finder, value parsing,
-  E24 lookup, colour-band encoding, resistor / circuit / network SVG drawing, tabs
+  E24 lookup, colour-band encoding, resistor / circuit / network SVG drawing, tabs, title circuit
+- `CHANGELOG.md` — visual changelog: each development stage with a screenshot
+- `dev-screenshots/` — those screenshots (JPEG, 900 px wide), taken from the code at each stage's commit
 
 ## Changelog
+
+A stage-by-stage visual version, with screenshots, is in [CHANGELOG.md](CHANGELOG.md).
 
 - 2026-11-21 — First version: inputs, calculations, closest E24 resistor with colour bands, power rating.
 - 2026-11-21 — Renamed P to P_LED. Results show required, closest standard and closest standard up, each with colour bands.
@@ -202,11 +207,16 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
 - 2026-11-22 — Title circuit: three LEDs in series pointing right, evenly over the middle two-thirds of the
   bottom edge; battery flipped to match; + label moved outside the border. Then grouped closer: 50 px apart, and finally
   spread over the middle 40% (30% / 50% / 70%).
+- 2026-11-22 — Title and tagline centred, with `text-wrap: balance` so neither leaves one word on its last line.
+  Stepped card lines mirrored on the right as well (full strength on both sides; the pattern is shared via
+  `--steps` / `--steps-w` on `.card`).
+- 2026-11-22 — Visual changelog: `CHANGELOG.md` with screenshots of every stage in `dev-screenshots/`.
 
 ## To do / watch out for
 
-- The stepped lines sit outside the card, so they need the left gutter: 37px on desktop, 15px on phones. If the
-  page's side padding shrinks, they'll be clipped.
+- The stepped lines sit outside the card on both sides, so they need the side gutters: 37px on desktop, 15px on
+  phones. If the page's side padding shrinks, they'll be clipped (checked: no sideways scroll at 320 px).
+- When a change is visible, add a stage to `CHANGELOG.md` with a screenshot in `dev-screenshots/`.
 - The page title and subtitle still talk only about LEDs, but tabs 3 and 4 are general resistor tools.
 - Possible: E96 suggestions for 5-band; a typed-expression input for the equivalent tab; bridge networks.
 - Big networks get wide in Edit mode (170 px per resistor); they scroll sideways in the card.
