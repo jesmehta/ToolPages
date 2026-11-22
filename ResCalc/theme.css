@@ -129,7 +129,7 @@ h1::after {
   display: block;
   width: 120px;
   height: 10px;
-  margin-top: 10px;
+  margin: 10px auto 0;                  /* centred under the title */
   background: var(--accent);
   -webkit-mask: var(--squiggle) repeat-x;
   mask: var(--squiggle) repeat-x;
@@ -154,7 +154,11 @@ h2::before {
 
 h3 { margin: 26px 0 10px; font-size: 1.05rem; font-weight: 600; }
 
-.subtitle { margin: 0; color: var(--muted); max-width: 52ch; }
+.subtitle { margin: 0 auto; color: var(--muted); max-width: 52ch; }
+
+/* Title and tagline are centred, with lines balanced so neither leaves a
+   single word on its last line. */
+header h1, header .subtitle { text-align: center; text-wrap: balance; }
 
 /* ---------- cards ---------- */
 
