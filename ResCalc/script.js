@@ -781,6 +781,70 @@ function showTab(name) {
 
 TABS.forEach(t => $(`tab-${t}`).addEventListener("click", () => showTab(t)));
 
+// ---------- palette trial (temporary) ----------
+//
+// Overrides --accent / --teal / --mustard on the page so candidate colour sets
+// can be compared live. Violet stays. In dark mode each colour is lightened a
+// little, like the theme's own dark values. Remove once a palette is chosen.
+
+const PAL_COLOURS = [
+  ["Tomato", "#E4572E"], ["Orange", "#E8731A"], ["Signal red", "#D62828"],
+  ["Fluoro pink", "#F2539B"], ["Copper", "#C8743A"], ["Coral", "#F0644B"],
+  ["Teal", "#1F8A85"], ["Green", "#2F8F46"], ["Cobalt", "#1D4E89"],
+  ["Riso teal", "#00838A"], ["PCB green", "#1E6B3A"], ["Slate blue", "#3A6EA5"],
+  ["Mustard", "#F2B134"], ["Yellow", "#E9B91F"], ["Chrome yellow", "#F2B705"],
+  ["Riso yellow", "#F7D417"], ["Solder gold", "#D9A93B"], ["Peach", "#F4A259"],
+];
+
+const PAL_SETS = {
+  "Current":          ["#E4572E", "#1F8A85", "#F2B134"],
+  "1. Resistor code": ["#E8731A", "#2F8F46", "#E9B91F"],
+  "2. Bauhaus":       ["#D62828", "#1D4E89", "#F2B705"],
+  "3. Risograph":     ["#F2539B", "#00838A", "#F7D417"],
+  "4. Circuit board": ["#C8743A", "#1E6B3A", "#D9A93B"],
+  "5. Dusk":          ["#F0644B", "#3A6EA5", "#F4A259"],
+};
+
+const PAL_ROLES = ["pal-accent", "pal-teal", "pal-mustard"];
+
+function lighten(hex, amount) {
+  const n = parseInt(hex.slice(1), 16);
+  const mix = c => Math.round(c + (255 - c) * amount).toString(16).padStart(2, "0");
+  return `#${mix(n >> 16)}${mix((n >> 8) & 255)}${mix(n & 255)}`;
+}
+
+function applyPalette() {
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const picks = PAL_ROLES.map(id => $(id).value);
+  PAL_ROLES.forEach((id, k) => {
+    document.documentElement.style.setProperty($(id).dataset.var, dark ? lighten(picks[k], 0.25) : picks[k]);
+  });
+  const match = Object.entries(PAL_SETS).find(([, cs]) => cs.every((c, k) => c === picks[k]));
+  $("pal-set").value = match ? match[0] : "";
+  $("pal-hex").textContent = picks.join(" · ");
+  try { localStorage.setItem("rescalc-palette", JSON.stringify(picks)); } catch (e) { /* storage blocked */ }
+}
+
+$("pal-set").innerHTML = `<option value="">(mixed)</option>` +
+  Object.keys(PAL_SETS).map(name => `<option value="${name}">${name}</option>`).join("");
+PAL_ROLES.forEach(id => {
+  $(id).innerHTML = PAL_COLOURS.map(([name, hex]) => `<option value="${hex}">${name}</option>`).join("");
+  $(id).addEventListener("change", applyPalette);
+});
+$("pal-set").addEventListener("change", e => {
+  const cs = PAL_SETS[e.target.value];
+  if (!cs) return;
+  PAL_ROLES.forEach((id, k) => { $(id).value = cs[k]; });
+  applyPalette();
+});
+{
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem("rescalc-palette")); } catch (e) { /* storage blocked */ }
+  const start = Array.isArray(saved) && saved.length === 3 ? saved : PAL_SETS.Current;
+  PAL_ROLES.forEach((id, k) => { $(id).value = start[k]; });
+  applyPalette();
+}
+
 // ---------- wiring ----------
 
 document.querySelectorAll("#panel-single input").forEach(el => el.addEventListener("input", updateSingle));
