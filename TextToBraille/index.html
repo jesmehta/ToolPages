@@ -1,21 +1,118 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.1/p5.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.1/addons/p5.sound.min.js"></script>
-  <!-- <script language="javascript" type="text/javascript" src="libraries/p5.js"></script>
-  <script language="javascript" src="libraries/p5.dom.js"></script>
-  <script language="javascript" src="libraries/p5.sound.js"></script> -->
-  <script language="javascript" type="text/javascript" src="sketch.js"></script>
-  <!-- <script language="javascript" type="text/javascript" src="timeStamps.js"></script> -->
-  <!-- <script src="https://unpkg.com/p5.js-svg@1.1.1"></script> -->
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Text to Braille</title>
+  <meta name="description" content="Type text, get braille (UEB Grade 1) as clean SVG dots in real millimetres, for laser engravers, plotters, 3D printing and embossing. Download SVG, PNG or ZIP.">
+  <!-- link previews (WhatsApp, Slack, LinkedIn, X...): absolute URLs on the Cabinet. og-preview.jpg is made once the look is settled. -->
+  <meta property="og:title" content="Text to Braille">
+  <meta property="og:description" content="Type text, get braille as SVG dots in real millimetres, for laser engravers, plotters and embossing.">
+  <meta property="og:image" content="https://cabinetofcuriosities.in/text-to-braille/og-preview.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The words Text to Braille above their braille dots">
+  <meta property="og:url" content="https://cabinetofcuriosities.in/text-to-braille/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Cabinet of Curiosities">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="theme.css">
 </head>
-
 <body>
+  <main>
+    <a class="back-link" href="https://cabinetofcuriosities.in/">&larr; Cabinet of Curiosities</a>
+
+    <header id="hero">
+      <!-- the title in braille, drawn by drawHero() in script.js with the same engine as the preview -->
+      <svg class="hero-braille" id="hero-braille" aria-hidden="true"></svg>
+      <h1>Text to Braille</h1>
+      <p class="subtitle">Type text, get braille as clean dots in real millimetres, ready for a laser engraver, plotter, 3D print or hand embossing.</p>
+    </header>
+
+    <div class="workspace">
+
+      <!-- ============ text in ============ -->
+      <section class="card area-text">
+        <h2><label for="text-in">Text</label></h2>
+        <textarea id="text-in" rows="4" spellcheck="false">Hello, World!
+Braille has 6 dots.</textarea>
+        <p class="hint">UEB Grade 1 (uncontracted): letters, capitals, numbers and common punctuation. New lines are kept.</p>
+        <p class="warn" id="unsupported" hidden></p>
+      </section>
+
+      <!-- ============ Unicode braille ============ -->
+      <section class="card area-unicode">
+        <div class="card-head">
+          <h2>Unicode braille</h2>
+          <button type="button" class="small" id="copy-unicode">Copy</button>
+        </div>
+        <output id="unicode-out" class="unicode-out" lang="en-Brai"></output>
+        <p class="hint">Braille characters (U+2800 block), one line per line of text, for pasting into documents or braille displays.</p>
+      </section>
+
+      <!-- ============ preview ============ -->
+      <section class="card area-preview">
+        <div class="card-head">
+          <h2>Preview</h2>
+          <label class="zoom">Zoom
+            <select id="zoom">
+              <option value="fit">Fit</option>
+              <option value="1" selected>1:1</option>
+              <option value="1.5">1.5&times;</option>
+              <option value="2">2&times;</option>
+              <option value="3">3&times;</option>
+            </select>
+          </label>
+        </div>
+        <div class="preview-wrap">
+          <svg id="preview" class="preview" role="img" aria-label="Braille preview"></svg>
+        </div>
+        <p class="readout" id="readout"></p>
+        <p class="legend" id="sign-legend"><span class="sig">^</span> capital sign &middot; <span class="sig">#</span> number sign &middot; <span class="sig">;</span> letter sign (a&ndash;j straight after a number)</p>
+      </section>
+
+      <!-- ============ controls ============ -->
+      <section class="card area-controls">
+        <h2>Size &amp; spacing</h2>
+        <!-- rows (slider + number box) are built from SIZES in script.js -->
+        <div id="size-rows" class="size-rows"></div>
+        <div class="row-buttons">
+          <button type="button" id="reset-sizes" title="Dot 1.5 mm, dots 2.5 mm apart, cells 6.0 mm apart, lines 10.0 mm apart (Marburg Medium), scale 1&times;">Reset to standard braille size</button>
+        </div>
+        <p class="warn" id="size-warn" hidden></p>
+
+        <h2>Show</h2>
+        <div class="toggles">
+          <label><input type="checkbox" id="opt-letters" checked> Roman letters under the cells</label>
+          <label class="sub"><input type="checkbox" id="opt-signlabels" checked> Label the signs (<span class="sig">^</span> <span class="sig">#</span> <span class="sig">;</span>)</label>
+          <label><input type="checkbox" id="opt-capitals" checked> Capital signs</label>
+          <label><input type="checkbox" id="opt-ghost"> Empty dot positions</label>
+          <label class="sub"><input type="checkbox" id="opt-ghost-export"> &hellip; in downloads too</label>
+          <label><input type="checkbox" id="opt-mirror"> Mirror, for embossing from the back</label>
+        </div>
+
+        <h2>Download</h2>
+        <div class="export-grid">
+          <label>Dots <input type="color" id="col-dots" value="#000000"></label>
+          <label>Letters <input type="color" id="col-letters" value="#555555"></label>
+          <label>PNG <input type="number" id="ppm" value="10" min="1" max="40" step="1"> px/mm</label>
+        </div>
+        <p class="hint">Colours apply to the downloaded files; the preview follows the page theme. SVG has a transparent background, PNG a white one.</p>
+        <div class="export-buttons">
+          <button type="button" class="pri" id="x-svg">SVG</button>
+          <button type="button" class="pri" id="x-png">PNG</button>
+          <button type="button" class="pri" id="x-zip" title="SVG + PNG + the text (original and Unicode braille) in one .zip">ZIP</button>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <p>Original sketch 2021 by Jesal Mehta. Downloads are free to use for non-commercial purposes (plotters, laser engravers, embossing); get in touch for anything else.</p>
+    </footer>
+  </main>
+
+
+  <script src="script.js"></script>
 </body>
 </html>
-
-<!-- Code is copyright by Jesal Mehta, 15/01/2021
-     The output of this program is free to use for non-commercial purposes (for your plotters, laser engravers etc). Contact me if you need a different license.
--->

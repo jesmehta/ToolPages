@@ -1,0 +1,126 @@
+@import url("https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800;900&family=Overpass+Mono:wght@500;600&display=swap");
+
+/* SIGNAGE — where most people meet braille: the room sign. A concrete wall, the title on a light
+   brushed-aluminium sign, the cards as dark sign plates with corner screws and a signal-orange stripe,
+   domed silver dots. Overpass is an open version of the US highway sign lettering.
+   Chosen 2026-11-22 from a theme trial (embossed paper, midnight, risograph, signage) and then an
+   accent × wall trial on signage (README, Design decisions). */
+
+:root {
+  color-scheme: light;
+  --bg: #c9ced3;
+  --card: #24282e;             /* sign plate */
+  --text: #f2f3f4;
+  --muted: #a7adb5;
+  --border: #111418;
+  --rule: #3a4048;
+  --accent: #ff6a2b;           /* signal orange */
+  --accent-deep: #c94612;
+  --accent-2: #4f9be8;
+  --on-accent: #16181b;
+  --warn-bg: #4b2a14;
+  --warn-text: #ffcfae;
+  --sheet: #2d3239;
+  --dot: #d8dde3;
+  --dot-fill: url(#pv-dome);
+  --dome-hi: #ffffff;
+  --dome-mid: #c3c9d0;
+  --dome-lo: #6e7782;
+  --ghost: #454c56;
+  --label: #c3c9d0;
+  --label-sign: var(--accent);
+  --radius: 14px;
+  --font-display: "Overpass", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Overpass", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Overpass Mono", Consolas, monospace;
+}
+
+html { background: var(--bg); }
+body {
+  /* concrete wall (concrete-bg.svg, made by dev-tools/make-bg-tile.mjs) under a soft light falloff */
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(0, 0, 0, 0.10)),
+    url("concrete-bg.svg");
+  background-size: 100% 100%, 420px 420px;
+  min-height: 100vh;
+}
+
+/* small text on the wall gets its own little label so it reads over the texture */
+.back-link {
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: rgba(36, 40, 46, 0.88);
+  color: #e6e8ea;
+}
+.back-link:hover, .back-link:focus-visible { color: var(--accent); }
+
+/* ---------- header: a light brushed-aluminium room sign with a coloured band ---------- */
+header {
+  position: relative;
+  max-width: 720px;
+  padding: 26px 34px 26px;
+  border-radius: 14px;
+  color: #16191d;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.25) 0 1px, rgba(0, 0, 0, 0.03) 1px 2px, transparent 2px 3px),
+    linear-gradient(160deg, #eef0f2 0%, #d3d8dd 55%, #e4e7ea 100%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 10px 24px -8px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.35);
+  border-top: 10px solid var(--accent);
+}
+header::before, header::after {   /* screws */
+  content: "";
+  position: absolute;
+  top: 12px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff, #9aa2ab 60%, #5d646d);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+}
+header::before { left: 14px; }
+header::after { right: 14px; }
+
+.hero-braille .on {
+  fill: var(--accent);
+  filter: drop-shadow(0.12px 0.22px 0.12px rgba(0, 0, 0, 0.5));
+}
+.hero-braille .off { stroke: #9aa2ab; }
+h1 { font-weight: 900; letter-spacing: -0.01em; color: #16191d; }
+.subtitle { color: #454c55; }
+
+/* ---------- cards: dark sign plates, screws in the corners, accent stripe on top ---------- */
+.card {
+  position: relative;
+  padding: 24px 24px 24px;
+  border: 1px solid #0c0e11;
+  border-top: 5px solid var(--accent);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 10px 22px -8px rgba(0, 0, 0, 0.55), 0 1px 2px rgba(0, 0, 0, 0.4);
+  background-image:
+    radial-gradient(circle at 12px 12px, #9aa2ab 0 2.5px, #3d434b 3px, transparent 3.6px),
+    radial-gradient(circle at calc(100% - 12px) 12px, #9aa2ab 0 2.5px, #3d434b 3px, transparent 3.6px),
+    radial-gradient(circle at 12px calc(100% - 12px), #9aa2ab 0 2.5px, #3d434b 3px, transparent 3.6px),
+    radial-gradient(circle at calc(100% - 12px) calc(100% - 12px), #9aa2ab 0 2.5px, #3d434b 3px, transparent 3.6px);
+}
+h2 {
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.preview-wrap { background: var(--sheet); border-radius: 8px; padding: 14px; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5); }
+
+textarea, .num input, .export-grid input[type=number], .zoom select { background: #1a1d22; color: var(--text); border: 1px solid #454c56; border-radius: 5px; }
+button { background: #30353d; border-color: #454c56; }
+button.pri { font-weight: 800; letter-spacing: 0.06em; box-shadow: 0 2px 0 var(--accent-deep); }
+button.pri:active { transform: translateY(2px); box-shadow: none; }
+.unicode-out { color: var(--accent); }
+
+footer p {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: rgba(36, 40, 46, 0.88);
+  color: #c3c9d0;
+}
