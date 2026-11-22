@@ -168,6 +168,8 @@ Bad values get a red outline; the equivalent tab shows an error, the finder show
   colours, scattered but each one horizontal or vertical
 - `script.js` — LED calculation (shared by tabs 1–2), equivalent-resistance network, resistor finder, value parsing,
   E24 lookup, colour-band encoding, resistor / circuit / network SVG drawing, tabs, title circuit
+- `og-preview.jpg` — the link-preview image (1200 × 630, ~60 KB) named by the `og:` tags in `index.html`
+- `dev-tools/make-og-preview.js` — remakes it from the page (Playwright); not published
 - `CHANGELOG.md` — visual changelog: each development stage with a screenshot
 - `dev-screenshots/` — those screenshots (JPEG, 900 px wide), taken from the code at each stage's commit
 
@@ -219,6 +221,8 @@ A stage-by-stage visual version, with screenshots, is in [CHANGELOG.md](CHANGELO
 - 2026-11-22 — "← Cabinet of Curiosities" link above the title (small, mono, muted; accent on hover).
 - 2026-11-22 — Cabinet route renamed to `/led-resistor-calculator/` (entry "LED Resistor Calculator"); the old
   `/resistor-calculator/` has no redirect.
+- 2026-11-22 — Link previews: Open Graph / Twitter tags (title "LED Resistor Calculator", description, image,
+  Cabinet URL) and `og-preview.jpg`, a 1200 × 630 shot of the title circuit and tabs.
 
 ## To do / watch out for
 
@@ -229,6 +233,10 @@ A stage-by-stage visual version, with screenshots, is in [CHANGELOG.md](CHANGELO
   `content/external-allowlists/led-resistor-calculator.txt` (today: index.html, style.css, theme.css, script.js,
   bg-symbols.svg). The repo has GitHub Pages on, so a copy also sits at jesmehta.github.io/ToolPages/ResCalc/;
   the Cabinet URL is the one to share.
+- **Link previews:** the `og:` URLs are absolute and point at the Cabinet, so they only work once Cabinet
+  publishes `og-preview.jpg` (it is in the allowlist). If the title or look changes, re-run
+  `dev-tools/make-og-preview.js` and keep the image under ~300 KB (WhatsApp drops larger ones). WhatsApp caches
+  previews per URL; test with `?v=2` etc.
 - When a change is visible, add a stage to `CHANGELOG.md` with a screenshot in `dev-screenshots/`.
 - The page title and subtitle still talk only about LEDs, but tabs 3 and 4 are general resistor tools.
 - Possible: E96 suggestions for 5-band; a typed-expression input for the equivalent tab; bridge networks.
